@@ -25,3 +25,12 @@ ios/
 # Environment files (contains API keys)
 .env.local
 .env.*.local
+
+# Future app ideas (remove from .gitignore when ready to build)
+aurahome-ai_-interior-designer/
+chronos-weaver_-infinite-journeys/
+commutecast-ai/
+mailgenie-ai/
+memegenius-ai/
+sentix_-customer-sentiment-dashboard/
+virtual-food-photographer/
