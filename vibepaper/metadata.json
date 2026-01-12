@@ -1,0 +1,8 @@
+
+{
+  "name": "VibePaper",
+  "description": "A high-end mobile-first wallpaper generator that creates custom backgrounds based on your desired vibe using Gemini 3 Pro Image. Remix results or combine with your own photos.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
