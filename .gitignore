@@ -18,3 +18,10 @@ dist/
 build/
 *.log
 APP-Factory/
+
+# iOS/Xcode (Capacitor generates these, don't commit)
+ios/
+
+# Environment files (contains API keys)
+.env.local
+.env.*.local
