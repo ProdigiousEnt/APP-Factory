@@ -4,8 +4,8 @@ import { Capacitor } from '@capacitor/core';
 
 // API Key should be in .env.local as VITE_REVENUECAT_APPLE_KEY
 const APPLE_API_KEY = (import.meta as any).env.VITE_REVENUECAT_APPLE_KEY || '';
-const PRODUCT_ID = 'vibepaper_pro_yearly'; // Must match App Store Connect exactly
-const ENTITLEMENT_ID = 'Pro';
+const PRODUCT_ID = 'vibepaper_pro_monthly'; // Must match App Store Connect exactly
+const ENTITLEMENT_ID = 'pro';
 
 export const revenueCatService = {
     async initialize() {

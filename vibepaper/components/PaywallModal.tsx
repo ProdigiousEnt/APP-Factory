@@ -95,11 +95,11 @@ export const PaywallModal: React.FC<PaywallModalProps> = ({ onClose, onPurchase 
                     <div className="flex justify-between items-start mb-4">
                         <div>
                             <h3 className="text-xl font-bold text-slate-900">VibePaper Pro</h3>
-                            <p className="text-sm text-blue-600 font-semibold">Annual Subscription</p>
+                            <p className="text-sm text-blue-600 font-semibold">Monthly Subscription</p>
                         </div>
                         <div className="text-right">
                             <p className="text-2xl font-bold text-slate-900">$4.99</p>
-                            <p className="text-sm text-slate-500">per year</p>
+                            <p className="text-sm text-slate-500">per month</p>
                         </div>
                     </div>
 
@@ -107,11 +107,11 @@ export const PaywallModal: React.FC<PaywallModalProps> = ({ onClose, onPurchase 
                     <div className="space-y-2 mb-4 pb-4 border-b border-slate-200">
                         <div className="flex items-center gap-2 text-sm text-slate-700">
                             <span>⏱</span>
-                            <span>12 months of premium access</span>
+                            <span>Billed monthly</span>
                         </div>
                         <div className="flex items-center gap-2 text-sm text-slate-700">
                             <span>💵</span>
-                            <span>Just $0.42 per month</span>
+                            <span>Cancel anytime</span>
                         </div>
                     </div>
 
@@ -146,7 +146,7 @@ export const PaywallModal: React.FC<PaywallModalProps> = ({ onClose, onPurchase 
 
                 {/* Auto-Renewal Disclaimer */}
                 <p className="text-[10px] text-center text-white/70 mb-4 px-6 leading-tight max-w-sm">
-                    Subscription automatically renews annually. Cancel anytime in App Store settings.
+                    Subscription automatically renews monthly. Cancel anytime in App Store settings.
                     Payment charged to Apple ID at confirmation of purchase.
                 </p>
 
