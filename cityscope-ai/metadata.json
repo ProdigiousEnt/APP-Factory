@@ -1,0 +1,7 @@
+{
+  "name": "CityScope AI",
+  "description": "Snap a photo of any city landmark and CityScope AI will identify it, research its history in real-time using Google Search, and generate an immersive narrated tour guide experience.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}

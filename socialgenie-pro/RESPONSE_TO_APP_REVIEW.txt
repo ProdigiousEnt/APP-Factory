@@ -1,0 +1,40 @@
+Subject: Re: SocialGenie Pro - Guideline 2.3 Issue Resolution
+
+Dear App Review Team,
+
+Thank you for your feedback regarding SocialGenie Pro (Submission ID: d849fbd4-b898-4b08-8e91-812371f18f18).
+
+We appreciate you identifying the issue with our subscription feature visibility under Guideline 2.3 - Performance - Accurate Metadata. We have carefully reviewed your feedback and have made the following improvements to our app:
+
+CHANGES IMPLEMENTED:
+
+1. Enhanced Subscription Visibility
+   - Added a prominent "Upgrade to Pro" banner above the main content input area
+   - The banner is now visible to all free-tier users at all times
+   - Clear value proposition displayed: "Upgrade to Pro for Unlimited Generations"
+
+2. Improved Usage Counter Display
+   - Free tier usage counter (X/3) is prominently displayed in the app header
+   - Users can clearly see their remaining generations before hitting the limit
+   - "PRO" badge is visible in the header for easy access to subscription details
+
+3. Professional UI Updates
+   - Removed all test/placeholder language
+   - Polished subscription flow with clear pricing and benefits
+   - Professional paywall UI that clearly communicates Pro features
+
+4. Testing Notes for Reviewers
+   - We have included detailed testing instructions in the "Notes" section
+   - Usage limits are temporarily disabled to allow thorough testing
+   - Limits will be re-enabled immediately after approval
+
+We believe these changes fully address the concerns raised in your review and provide a clear, accessible path for users to discover and subscribe to our Pro features.
+
+The updated build is ready for resubmission. Please let us know if you need any additional information or clarification.
+
+Thank you for your time and consideration.
+
+Best regards,
+Dennis Harrington
+SocialGenie Pro Developer
+dennisharrington66@gmail.com

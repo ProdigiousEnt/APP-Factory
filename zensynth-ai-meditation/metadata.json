@@ -1,0 +1,7 @@
+{
+  "name": "ZenSynth AI Meditation",
+  "description": "A bespoke guided meditation platform where AI generates personalized scripts, immersive 4K visuals, and soothing voiceovers for a unique mindfulness experience.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}
