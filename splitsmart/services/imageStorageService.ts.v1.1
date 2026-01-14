@@ -1,0 +1,171 @@
+import { Filesystem, Directory } from '@capacitor/filesystem';
+
+/**
+ * Local Receipt Image Storage Service
+ * 
+ * Stores receipt images on-device to enable Annual Reports with images
+ * at zero cloud storage cost. Images are saved in Documents/receipts/
+ * and referenced by receipt ID.
+ */
+
+/**
+ * Save a receipt image to local device storage
+ * @param base64Image - Base64 encoded image data
+ * @param receiptId - Unique receipt ID from Supabase
+ * @returns Filename of saved image
+ */
+export const saveReceiptImage = async (
+  base64Image: string,
+  receiptId: string
+): Promise<string> => {
+  try {
+    const filename = `${receiptId}.jpg`;
+    
+    await Filesystem.writeFile({
+      path: `receipts/${filename}`,
+      data: base64Image,
+      directory: Directory.Documents,
+      recursive: true  // Create receipts/ folder if it doesn't exist
+    });
+    
+    console.log(`Receipt image saved: ${filename}`);
+    return filename;
+  } catch (error) {
+    console.error('Failed to save receipt image:', error);
+    throw error;
+  }
+};
+
+/**
+ * Load a receipt image from local storage
+ * @param filename - Filename of the image (e.g., "receipt_123.jpg")
+ * @returns Base64 encoded image data, or null if not found
+ */
+export const loadReceiptImage = async (
+  filename: string
+): Promise<string | null> => {
+  try {
+    const file = await Filesystem.readFile({
+      path: `receipts/${filename}`,
+      directory: Directory.Documents
+    });
+    
+    return file.data as string;  // Base64 string
+  } catch (error) {
+    console.error(`Failed to load image ${filename}:`, error);
+    return null;
+  }
+};
+
+/**
+ * Delete a receipt image from local storage
+ * @param filename - Filename of the image to delete
+ */
+export const deleteReceiptImage = async (
+  filename: string
+): Promise<void> => {
+  try {
+    await Filesystem.deleteFile({
+      path: `receipts/${filename}`,
+      directory: Directory.Documents
+    });
+    
+    console.log(`Receipt image deleted: ${filename}`);
+  } catch (error) {
+    console.error(`Failed to delete image ${filename}:`, error);
+    // Don't throw - deletion failure shouldn't break the app
+  }
+};
+
+/**
+ * Get list of all stored receipt images
+ * @returns Array of filenames
+ */
+export const getAllReceiptImages = async (): Promise<string[]> => {
+  try {
+    const result = await Filesystem.readdir({
+      path: 'receipts',
+      directory: Directory.Documents
+    });
+    
+    return result.files.map(f => f.name);
+  } catch (error) {
+    console.error('Failed to list receipt images:', error);
+    return [];
+  }
+};
+
+/**
+ * Get total storage used by receipt images
+ * @returns Size in bytes
+ */
+export const getStorageUsed = async (): Promise<number> => {
+  try {
+    const files = await getAllReceiptImages();
+    let totalSize = 0;
+    
+    for (const filename of files) {
+      try {
+        const stat = await Filesystem.stat({
+          path: `receipts/${filename}`,
+          directory: Directory.Documents
+        });
+        totalSize += stat.size;
+      } catch (error) {
+        // Skip files that can't be read
+        continue;
+      }
+    }
+    
+    return totalSize;
+  } catch (error) {
+    console.error('Failed to calculate storage:', error);
+    return 0;
+  }
+};
+
+/**
+ * Clean up images older than specified days
+ * @param daysOld - Delete images older than this many days
+ * @returns Number of images deleted
+ */
+export const cleanupOldImages = async (daysOld: number = 730): Promise<number> => {
+  try {
+    const files = await getAllReceiptImages();
+    const cutoffDate = Date.now() - (daysOld * 24 * 60 * 60 * 1000);
+    let deletedCount = 0;
+    
+    for (const filename of files) {
+      try {
+        const stat = await Filesystem.stat({
+          path: `receipts/${filename}`,
+          directory: Directory.Documents
+        });
+        
+        if (stat.mtime < cutoffDate) {
+          await deleteReceiptImage(filename);
+          deletedCount++;
+        }
+      } catch (error) {
+        continue;
+      }
+    }
+    
+    console.log(`Cleaned up ${deletedCount} old receipt images`);
+    return deletedCount;
+  } catch (error) {
+    console.error('Failed to cleanup old images:', error);
+    return 0;
+  }
+};
+
+/**
+ * Format storage size for display
+ * @param bytes - Size in bytes
+ * @returns Formatted string (e.g., "5.2 MB")
+ */
+export const formatStorageSize = (bytes: number): string => {
+  if (bytes < 1024) return `${bytes} B`;
+  if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`;
+  return `${(bytes / (1024 * 1024)).toFixed(1)} MB`;
+};
