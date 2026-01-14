@@ -1,32 +1,28 @@
-# App directories (managed separately or local only)
-socialgenie-pro/
-cityscope-ai/
-splitsmart/
-vibepaper/
-zensynth-ai-meditation/
-Triviarc/
-_Blueprints/
-
 # macOS
 .DS_Store
 
-# Node modules
+# Node modules (never commit)
 node_modules/
 
-# Build outputs
+# Build outputs (generated files)
 dist/
 build/
 *.log
-APP-Factory/
 
 # iOS/Xcode (Capacitor generates these, don't commit)
 ios/
+android/
 
-# Environment files (contains API keys)
+# Environment files (contains API keys - SECURITY CRITICAL)
+.env
 .env.local
 .env.*.local
+*.env
 
-# Future app ideas (remove from .gitignore when ready to build)
+# Public repo clone (if you have it locally)
+APP-Factory/
+
+# Future app ideas (not ready for production)
 aurahome-ai_-interior-designer/
 chronos-weaver_-infinite-journeys/
 commutecast-ai/
@@ -34,3 +30,5 @@ mailgenie-ai/
 memegenius-ai/
 sentix_-customer-sentiment-dashboard/
 virtual-food-photographer/
+Triviarc/
+_Blueprints/
