@@ -22,6 +22,9 @@ android/
 # Public repo clone (if you have it locally)
 APP-Factory/
 
+# Backups (temporary recovery files)
+vibepaper.backup/
+
 # Future app ideas (not ready for production)
 aurahome-ai_-interior-designer/
 chronos-weaver_-infinite-journeys/
