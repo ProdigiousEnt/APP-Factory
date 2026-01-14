@@ -37,14 +37,14 @@ export const Paywall: React.FC<PaywallProps> = ({ onClose, onSuccess }) => {
     };
 
     const openTermsOfUse = async () => {
-        await Browser.open({ 
-            url: 'https://www.apple.com/legal/internet-services/itunes/dev/stdeula/' 
+        await Browser.open({
+            url: 'https://www.apple.com/legal/internet-services/itunes/dev/stdeula/'
         });
     };
 
     const openPrivacyPolicy = async () => {
-        await Browser.open({ 
-            url: 'https://prodigiousent.github.io/APP-Factory/docs/splitsmart/privacy-policy.html' 
+        await Browser.open({
+            url: 'https://prodigiousent.github.io/APP-Factory/docs/splitsmart/privacy-policy.html'
         });
     };
 
@@ -154,14 +154,14 @@ export const Paywall: React.FC<PaywallProps> = ({ onClose, onSuccess }) => {
                 </div>
 
                 <div className="flex justify-center items-center gap-3 px-6 py-6 text-sm font-medium">
-                    <button 
+                    <button
                         onClick={openTermsOfUse}
                         className="text-white/80 hover:text-white hover:underline"
                     >
                         Terms of Use
                     </button>
                     <span className="text-white/40">•</span>
-                    <button 
+                    <button
                         onClick={openPrivacyPolicy}
                         className="text-white/80 hover:text-white hover:underline"
                     >
