@@ -7,13 +7,11 @@ interface UsageRecord {
     app_id: string;
     device_id: string;
     generation_count: number;
-    week_start_date: string;
     created_at: string;
     updated_at: string;
 }
 
-const FREE_TIER_LIMIT = 3;
-const WEEK_IN_MS = 7 * 24 * 60 * 60 * 1000;
+const FREE_TIER_LIMIT = 3; // 3 generations total (lifetime)
 
 export const UsageLimitService = {
     /**
@@ -33,15 +31,6 @@ export const UsageLimitService = {
             }
             return deviceId;
         }
-    },
-
-    /**
-     * Checks if a new week has started and resets counter if needed
-     */
-    shouldResetWeek(weekStartDate: string): boolean {
-        const weekStart = new Date(weekStartDate).getTime();
-        const now = Date.now();
-        return (now - weekStart) >= WEEK_IN_MS;
     },
 
     /**
@@ -82,7 +71,6 @@ export const UsageLimitService = {
                     app_id: APP_ID,
                     device_id: deviceId,
                     generation_count: 0,
-                    week_start_date: new Date().toISOString(),
                 })
                 .select()
                 .single();
@@ -96,106 +84,73 @@ export const UsageLimitService = {
     },
 
     /**
-     * Resets the weekly counter
-     */
-    async resetWeeklyCounter(deviceId: string): Promise<void> {
-        try {
-            const { error } = await supabase
-                .from('generation_usage')
-                .update({
-                    generation_count: 0,
-                    week_start_date: new Date().toISOString(),
-                    updated_at: new Date().toISOString(),
-                })
-                .eq('app_id', APP_ID)
-                .eq('device_id', deviceId);
-
-            if (error) throw error;
-            console.log('[UsageLimit] Weekly counter reset');
-        } catch (error) {
-            console.error('[UsageLimit] Failed to reset counter:', error);
-        }
-    },
-
-    /**
-     * Checks remaining generations for free tier
-     * Returns: { allowed: boolean, remaining: number, resetDate: Date }
+     * Checks if user has remaining generations (LIFETIME limit, no weekly reset)
      */
     async checkGenerationLimit(): Promise<{ allowed: boolean; remaining: number; resetDate: Date | null }> {
         try {
             let record = await this.getUsageRecord();
 
-            // First time user - create record
+            // If no record exists, create one
             if (!record) {
-                console.log('[UsageLimit] No record found, creating new record');
+                console.log('[UsageLimit] No record found, creating new one');
                 record = await this.createUsageRecord();
                 if (!record) {
-                    // Fallback: allow generation if Supabase fails
+                    // If creation fails, allow generation (fail-open for better UX)
                     console.warn('[UsageLimit] Failed to create record, allowing generation');
                     return { allowed: true, remaining: FREE_TIER_LIMIT, resetDate: null };
                 }
             }
 
-            // Check if week has passed - reset if needed
-            if (this.shouldResetWeek(record.week_start_date)) {
-                console.log('[UsageLimit] Week has passed, resetting counter');
-                const deviceId = await this.getDeviceId();
-                await this.resetWeeklyCounter(deviceId);
-                record.generation_count = 0;
-                record.week_start_date = new Date().toISOString();
-            }
-
             const remaining = Math.max(0, FREE_TIER_LIMIT - record.generation_count);
-            const resetDate = new Date(new Date(record.week_start_date).getTime() + WEEK_IN_MS);
             const allowed = record.generation_count < FREE_TIER_LIMIT;
 
-            console.log(`[UsageLimit] Check result: count=${record.generation_count}, remaining=${remaining}, allowed=${allowed}`);
+            console.log(`[UsageLimit] Count: ${record.generation_count}/${FREE_TIER_LIMIT}, Remaining: ${remaining}, Allowed: ${allowed}`);
 
             return {
                 allowed,
                 remaining,
-                resetDate,
+                resetDate: null // No reset - lifetime limit
             };
         } catch (error) {
-            console.error('[UsageLimit] Check failed:', error);
-            // Fallback: allow generation if check fails (better UX than blocking)
-            console.warn('[UsageLimit] Allowing generation due to error');
+            console.error('[UsageLimit] Error checking limit:', error);
+            // Fail-open: allow generation if there's an error
             return { allowed: true, remaining: FREE_TIER_LIMIT, resetDate: null };
         }
     },
 
     /**
-     * Increments generation count after successful generation
+     * Increments the generation count after a successful generation
      */
     async incrementGenerationCount(): Promise<void> {
         try {
             const deviceId = await this.getDeviceId();
 
-            const { error } = await supabase.rpc('increment_generation_count', {
+            // Try using the RPC function first (atomic operation)
+            const { error: rpcError } = await supabase.rpc('increment_generation_count', {
                 p_app_id: APP_ID,
-                p_device_id: deviceId,
+                p_device_id: deviceId
             });
 
-            // Fallback if RPC doesn't exist - use update
-            if (error && error.code === '42883') {
-                const record = await this.getUsageRecord();
-                if (record) {
-                    await supabase
-                        .from('generation_usage')
-                        .update({
-                            generation_count: record.generation_count + 1,
-                            updated_at: new Date().toISOString(),
-                        })
-                        .eq('app_id', APP_ID)
-                        .eq('device_id', deviceId);
-                }
-            } else if (error) {
-                throw error;
+            if (rpcError) {
+                console.warn('[UsageLimit] RPC failed, using direct update:', rpcError);
+
+                // Fallback: direct update
+                const { error: updateError } = await supabase
+                    .from('generation_usage')
+                    .update({
+                        generation_count: supabase.raw('generation_count + 1'),
+                        updated_at: new Date().toISOString()
+                    })
+                    .eq('app_id', APP_ID)
+                    .eq('device_id', deviceId);
+
+                if (updateError) throw updateError;
             }
 
             console.log('[UsageLimit] Generation count incremented');
         } catch (error) {
             console.error('[UsageLimit] Failed to increment count:', error);
+            // Non-blocking error - we already allowed the generation
         }
-    },
+    }
 };

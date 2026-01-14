@@ -33,7 +33,7 @@ Usage limits will be **re-enabled immediately after approval** by uncommenting l
 
 ```typescript
 // TEMPORARY: Bypass usage limit check for testing
-// TODO: Re-enable once Supabase generation_usage table is set up
+// ✅ Supabase generation_usage table configured with RLS policies
 /*
 // Usage Limit Check: Free tier gets 3 generations per week
 if (!isPro) {

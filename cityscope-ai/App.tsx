@@ -57,9 +57,8 @@ const drawTextOverlay = (base64: string, text: string): Promise<string> => {
   });
 };
 
-// REVIEWER MODE: Unlimited generations for App Store testing
-// Change back to APP_CONFIG.freeLimit before production release
-const FREE_LIMIT = 9999; // Was: APP_CONFIG.freeLimit
+// Production Mode: 3 free postcards total (lifetime)
+const FREE_LIMIT = APP_CONFIG.freeLimit; // = 3
 
 const App: React.FC = () => {
   const [state, setState] = useState<AppState>(AppState.IDLE);

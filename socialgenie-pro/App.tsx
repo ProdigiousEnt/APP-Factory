@@ -162,9 +162,6 @@ const App: React.FC = () => {
   const handleGenerate = async () => {
     if (!state.idea.trim()) return;
 
-    // TEMPORARY: Bypass usage limit check for testing
-    // TODO: Re-enable once Supabase generation_usage table is set up
-    /*
     // Usage Limit Check: Free tier gets 3 generations per week
     if (!isPro) {
       const limit = await UsageLimitService.checkGenerationLimit();
@@ -174,7 +171,6 @@ const App: React.FC = () => {
         return;
       }
     }
-    */
 
     // Entitlement Check: 2K is a Pro feature
     if (state.imageSize === '2K' && !isPro) {
