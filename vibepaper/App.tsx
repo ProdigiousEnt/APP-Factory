@@ -390,17 +390,29 @@ const App: React.FC = () => {
         <PaywallModal
           onClose={() => setShowPaywall(false)}
           onPurchase={async () => {
-            // Mock purchase for screenshots - in production this would call RevenueCat
-            if (appConfig.testingMode) {
-              setIsPro(true);
-              setShowPaywall(false);
-              await Haptics.notification({ type: ImpactStyle.Light as any });
-            } else {
-              const success = await revenueCatService.purchasePro();
-              if (success) {
+            try {
+              // Mock purchase for screenshots - in production this would call RevenueCat
+              if (appConfig.testingMode) {
+                console.log('[App] 🧪 Testing mode - mocking purchase');
                 setIsPro(true);
                 setShowPaywall(false);
+                await Haptics.notification({ type: ImpactStyle.Light as any });
+              } else {
+                console.log('[App] 💳 Starting real purchase flow');
+                const success = await revenueCatService.purchasePro();
+                if (success) {
+                  console.log('[App] ✅ Purchase successful - unlocking Pro');
+                  setIsPro(true);
+                  setShowPaywall(false);
+                  await Haptics.notification({ type: ImpactStyle.Light as any });
+                } else {
+                  console.log('[App] ❌ Purchase failed or cancelled');
+                  // Error already shown by revenueCatService
+                }
               }
+            } catch (error: any) {
+              console.error('[App] ❌ Unexpected error in purchase flow:', error);
+              alert(`An unexpected error occurred: ${error.message}`);
             }
           }}
         />

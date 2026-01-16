@@ -65,7 +65,10 @@ export const WallpaperModal: React.FC<WallpaperModalProps> = ({ wallpaper, onClo
 
         <div className="grid grid-cols-2 gap-4">
           <button
-            onClick={() => onRemix(wallpaper)}
+            onClick={() => {
+              onClose(); // Close modal immediately
+              onRemix(wallpaper);
+            }}
             className="flex items-center justify-center gap-2 bg-purple-600 hover:bg-purple-700 text-white font-semibold py-4 rounded-2xl transition-all active:scale-95"
           >
             <i className="fa-solid fa-wand-magic-sparkles"></i>

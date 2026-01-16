@@ -4,7 +4,9 @@ import { Capacitor } from '@capacitor/core';
 
 // API Key should be in .env.local as VITE_REVENUECAT_APPLE_KEY
 const APPLE_API_KEY = (import.meta as any).env.VITE_REVENUECAT_APPLE_KEY || '';
-const PRODUCT_ID = 'vibepaper_pro_monthly'; // Must match App Store Connect exactly
+// Support both products during review (reviewer may be grandfathered into yearly)
+const PRIMARY_PRODUCT_ID = 'vibepaper_pro_monthly'; // Primary product for new subscribers
+const LEGACY_PRODUCT_ID = 'vibepaper_pro_yearly'; // Legacy product for grandfathered users
 const ENTITLEMENT_ID = 'pro';
 
 export const revenueCatService = {
@@ -45,28 +47,54 @@ export const revenueCatService = {
         }
 
         try {
+            console.log('[RevenueCat] 🛒 Starting purchase flow...');
+
             const offerings = await Purchases.getOfferings();
-            if (offerings.current && offerings.current.availablePackages.length > 0) {
-                const targetPackage = offerings.current.availablePackages[0];
+            console.log('[RevenueCat] 📦 Offerings fetched:', {
+                hasCurrentOffering: !!offerings.current,
+                packageCount: offerings.current?.availablePackages.length || 0
+            });
 
-                // Defensive logging to catch product ID mismatches
-                console.log(`[RevenueCat] Purchasing product: ${targetPackage.product.identifier}`);
-                console.log(`[RevenueCat] Expected product ID: ${PRODUCT_ID}`);
-
-                const { customerInfo } = await Purchases.purchasePackage({
-                    aPackage: targetPackage
-                });
-                return customerInfo.entitlements?.active?.[ENTITLEMENT_ID] !== undefined;
+            if (!offerings.current || offerings.current.availablePackages.length === 0) {
+                console.error('[RevenueCat] ❌ No offerings available');
+                alert('Unable to load subscription options. Please check your internet connection and try again.');
+                return false;
             }
-            console.warn('[RevenueCat] No offerings available');
-            return false;
+
+            const targetPackage = offerings.current.availablePackages[0];
+
+            // Defensive logging to catch product ID mismatches
+            console.log(`[RevenueCat] 🎯 Purchasing product: ${targetPackage.product.identifier}`);
+            console.log(`[RevenueCat] 💰 Price: ${targetPackage.product.priceString}`);
+            console.log(`[RevenueCat] 📝 Supported products: ${PRIMARY_PRODUCT_ID}, ${LEGACY_PRODUCT_ID}`);
+
+            const { customerInfo } = await Purchases.purchasePackage({
+                aPackage: targetPackage
+            });
+
+            const hasEntitlement = customerInfo.entitlements?.active?.[ENTITLEMENT_ID] !== undefined;
+
+            if (hasEntitlement) {
+                console.log('[RevenueCat] ✅ Purchase successful - Pro unlocked');
+            } else {
+                console.warn('[RevenueCat] ⚠️ Purchase completed but entitlement not active');
+            }
+
+            return hasEntitlement;
         } catch (err: any) {
             if (err.userCancelled) {
-                console.log("User cancelled the purchase");
+                console.log('[RevenueCat] 🚫 User cancelled the purchase');
+                return false;
             } else {
-                console.error("Purchase error:", err);
+                console.error('[RevenueCat] ❌ Purchase error:', err);
+                console.error('[RevenueCat] Error details:', {
+                    message: err.message,
+                    code: err.code,
+                    underlyingErrorMessage: err.underlyingErrorMessage
+                });
+                alert(`Purchase failed: ${err.message || 'Unknown error'}. Please try again or contact support.`);
+                return false;
             }
-            return false;
         }
     },
 

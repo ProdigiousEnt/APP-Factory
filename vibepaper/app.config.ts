@@ -2,22 +2,23 @@
 
 export const appConfig = {
     // Testing Mode - Set to true during development to bypass Pro restrictions
-    testingMode: true, // ✅ ENABLED FOR APP STORE REVIEW - Unlimited testing
+    testingMode: false, // ❌ DISABLED FOR PRODUCTION - Tests real RevenueCat flow
 
     // Free tier configuration
-    freeGenerationLimit: 9999, // Set high for reviewer testing
-    freeBatchSize: 2, // Number of wallpapers generated per request for free users
+    freeGenerationLimit: 3, // 3 free generations (lifetime) - Changed from 9999 for production
+    freeBatchSize: 1, // Generate one image at a time
 
     // Pro tier configuration
-    proBatchSize: 4, // Number of wallpapers generated per request for Pro users
+    proBatchSize: 1, // Generate one image at a time to prevent API overload
+    proGenerationLimit: 100, // 100 generations per month for Pro users (~3/day)
 
     // Pro subscription details
     subscription: {
-        priceDisplay: '$4.99/year',
+        priceDisplay: '$4.99/month',
         features: [
-            'Unlimited wallpaper generations',
+            '100 wallpapers per month',
             '2K high-resolution output',
-            'Batch generation (4 variations at once)',
+            'One-tap remix for variations',
             'Priority processing'
         ]
     }

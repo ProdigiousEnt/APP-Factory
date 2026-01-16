@@ -86,7 +86,7 @@ export const PaywallModal: React.FC<PaywallModalProps> = ({ onClose, onPurchase 
 
                 {/* Tagline */}
                 <p className="text-white/90 text-base text-center mb-8 max-w-sm">
-                    Create stunning AI wallpapers with unlimited generations
+                    Create stunning AI wallpapers with 100 generations per month
                 </p>
 
                 {/* White Subscription Info Card */}
@@ -122,8 +122,8 @@ export const PaywallModal: React.FC<PaywallModalProps> = ({ onClose, onPurchase 
                             <li className="flex items-start gap-2 text-sm text-slate-700">
                                 <span className="text-green-600 font-bold flex-shrink-0">✓</span>
                                 <div>
-                                    <span className="font-semibold">Unlimited Wallpaper Generations</span>
-                                    <span className="text-slate-500"> - Create as many wallpapers as you want</span>
+                                    <span className="font-semibold">100 Wallpapers per Month</span>
+                                    <span className="text-slate-500"> - ~3 wallpapers per day</span>
                                 </div>
                             </li>
                             <li className="flex items-start gap-2 text-sm text-slate-700">
