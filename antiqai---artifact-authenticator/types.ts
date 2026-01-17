@@ -4,8 +4,11 @@ export interface ArtifactAnalysis {
   category: string;
   estimatedPeriod: string;
   description: string;
+  historicalContext: string;
+  inspectionGuide: string;
   authenticityMarkers: string[];
   counterfeitSigns: string[];
+  marketValueFactors: string;
   suggestedExperts: string[];
   sources?: Array<{
     title: string;
