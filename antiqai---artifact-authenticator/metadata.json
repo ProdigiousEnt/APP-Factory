@@ -1,0 +1,7 @@
+{
+  "name": "AntiqAI - Artifact Authenticator",
+  "description": "Identify antiques and artifacts from photos and get expert-level verification advice to distinguish genuine pieces from replicas.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}
