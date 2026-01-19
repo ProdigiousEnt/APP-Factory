@@ -12,6 +12,7 @@ interface UsageRecord {
 }
 
 const FREE_TIER_LIMIT = 3; // 3 generations total (lifetime)
+const PRO_TIER_LIMIT = 100; // 100 posts per month for Pro users ($4.99/month)
 
 export const UsageLimitService = {
     /**
@@ -84,7 +85,7 @@ export const UsageLimitService = {
     },
 
     /**
-     * Checks if user has remaining generations (LIFETIME limit, no weekly reset)
+     * Checks if user has remaining generations (LIFETIME limit for free tier)
      */
     async checkGenerationLimit(): Promise<{ allowed: boolean; remaining: number; resetDate: Date | null }> {
         try {
@@ -115,6 +116,37 @@ export const UsageLimitService = {
             console.error('[UsageLimit] Error checking limit:', error);
             // Fail-open: allow generation if there's an error
             return { allowed: true, remaining: FREE_TIER_LIMIT, resetDate: null };
+        }
+    },
+
+    /**
+     * Checks Pro tier monthly limit (40 posts/month)
+     */
+    async checkProGenerationLimit(): Promise<{ allowed: boolean; remaining: number; resetDate: Date }> {
+        try {
+            const deviceId = await this.getDeviceId();
+            const now = new Date();
+            const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+
+            // Get Pro usage from localStorage (keyed by month)
+            const storageKey = `sg_pro_usage_${currentMonth}`;
+            const storedCount = parseInt(localStorage.getItem(storageKey) || '0');
+
+            const remaining = Math.max(0, PRO_TIER_LIMIT - storedCount);
+            const allowed = storedCount < PRO_TIER_LIMIT;
+
+            // Calculate reset date (first day of next month)
+            const resetDate = new Date(now.getFullYear(), now.getMonth() + 1, 1);
+
+            console.log(`[UsageLimit Pro] Count: ${storedCount}/${PRO_TIER_LIMIT}, Remaining: ${remaining}, Allowed: ${allowed}`);
+
+            return { allowed, remaining, resetDate };
+        } catch (error) {
+            console.error('[UsageLimit] Error checking Pro limit:', error);
+            // Fail-open: allow generation if there's an error
+            const resetDate = new Date();
+            resetDate.setMonth(resetDate.getMonth() + 1, 1);
+            return { allowed: true, remaining: PRO_TIER_LIMIT, resetDate };
         }
     },
 
@@ -152,5 +184,24 @@ export const UsageLimitService = {
             console.error('[UsageLimit] Failed to increment count:', error);
             // Non-blocking error - we already allowed the generation
         }
+    },
+
+    /**
+     * Increments Pro tier monthly count
+     */
+    async incrementProGenerationCount(): Promise<void> {
+        try {
+            const now = new Date();
+            const currentMonth = `${now.getFullYear()}-${String(now.getMonth() + 1).padStart(2, '0')}`;
+            const storageKey = `sg_pro_usage_${currentMonth}`;
+
+            const currentCount = parseInt(localStorage.getItem(storageKey) || '0');
+            localStorage.setItem(storageKey, String(currentCount + 1));
+
+            console.log('[UsageLimit Pro] Count incremented to:', currentCount + 1);
+        } catch (error) {
+            console.error('[UsageLimit] Failed to increment Pro count:', error);
+        }
     }
 };
+

@@ -55,8 +55,8 @@ export const Paywall: React.FC<PaywallProps> = ({ onClose, onSuccess }) => {
 
     const benefits = [
         {
-            title: "Unlimited AI Content Generation",
-            description: "Create unlimited social media posts without daily caps"
+            title: "100 Posts per Month",
+            description: "~3 posts per day - perfect for consistent content creation"
         },
         {
             title: "2K High-Resolution Images",
@@ -109,23 +109,23 @@ export const Paywall: React.FC<PaywallProps> = ({ onClose, onSuccess }) => {
                     <div className="flex justify-between items-start mb-4">
                         <div>
                             <h3 className="text-xl font-bold text-slate-900">SocialGenie Pro</h3>
-                            <p className="text-sm text-blue-600 font-semibold">Annual Subscription</p>
+                            <p className="text-sm text-blue-600 font-semibold">Monthly Subscription</p>
                         </div>
                         <div className="text-right">
-                            <p className="text-2xl font-bold text-slate-900">{price || '$9.99'}</p>
-                            <p className="text-sm text-slate-500">per year</p>
+                            <p className="text-2xl font-bold text-slate-900">{price || '$4.99'}</p>
+                            <p className="text-sm text-slate-500">per month</p>
                         </div>
                     </div>
 
-                    {/* Duration + Price Per Month */}
+                    {/* Billing Info */}
                     <div className="space-y-2 mb-4 pb-4 border-b border-slate-200">
                         <div className="flex items-center gap-2 text-sm text-slate-600">
                             <span className="text-blue-600">⏱</span>
-                            <span>12 months of premium access</span>
+                            <span>Billed monthly</span>
                         </div>
                         <div className="flex items-center gap-2 text-sm text-slate-600">
                             <span className="text-blue-600">💵</span>
-                            <span>Just {calculateMonthlyPrice(price)} per month</span>
+                            <span>Cancel anytime</span>
                         </div>
                     </div>
 
@@ -153,7 +153,7 @@ export const Paywall: React.FC<PaywallProps> = ({ onClose, onSuccess }) => {
                         disabled={loading}
                         className="w-full bg-gradient-to-r from-indigo-600 to-indigo-700 text-white font-bold py-4 rounded-2xl shadow-lg shadow-indigo-500/30 hover:shadow-xl hover:shadow-indigo-500/40 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                     >
-                        {loading ? 'Processing...' : `Subscribe Now - ${price || '$9.99'}/year`}
+                        {loading ? 'Processing...' : `Subscribe Now - ${price || '$4.99'}/month`}
                     </button>
                     <button
                         onClick={handleRestore}
@@ -166,7 +166,7 @@ export const Paywall: React.FC<PaywallProps> = ({ onClose, onSuccess }) => {
 
                 {/* Auto-Renewal Disclaimer */}
                 <p className="px-6 pt-4 text-xs text-center text-slate-400 leading-relaxed">
-                    Subscription automatically renews annually. Cancel anytime in App Store settings. Payment charged to Apple ID at confirmation of purchase.
+                    Subscription automatically renews monthly. Cancel anytime in App Store settings. Payment charged to Apple ID at confirmation of purchase.
                 </p>
 
                 {/* Legal Links - Match CityScope */}
