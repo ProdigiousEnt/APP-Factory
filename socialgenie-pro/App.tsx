@@ -162,12 +162,21 @@ const App: React.FC = () => {
   const handleGenerate = async () => {
     if (!state.idea.trim()) return;
 
-    // Usage Limit Check: Free tier gets 3 generations per week
+    // Usage Limit Check
     if (!isPro) {
+      // Free tier: 3 generations (lifetime)
       const limit = await UsageLimitService.checkGenerationLimit();
-      console.log('[App] Usage limit check:', limit);
+      console.log('[App] Free tier limit check:', limit);
       if (!limit.allowed) {
         setShowPaywall(true);
+        return;
+      }
+    } else {
+      // Pro tier: 100 posts per month
+      const proLimit = await UsageLimitService.checkProGenerationLimit();
+      console.log('[App] Pro tier limit check:', proLimit);
+      if (!proLimit.allowed) {
+        alert(`You've reached your monthly limit of 100 posts. Your limit resets on ${proLimit.resetDate.toLocaleDateString()}.`);
         return;
       }
     }
@@ -241,12 +250,16 @@ const App: React.FC = () => {
     await Promise.all(promises);
     setState(prev => ({ ...prev, isGenerating: false }));
 
-    // Increment usage count for free tier
+    // Increment usage count
     if (!isPro) {
+      // Free tier
       await UsageLimitService.incrementGenerationCount();
       const limit = await UsageLimitService.checkGenerationLimit();
       setRemainingGenerations(limit.remaining);
       setResetDate(limit.resetDate);
+    } else {
+      // Pro tier
+      await UsageLimitService.incrementProGenerationCount();
     }
   };
 
@@ -413,8 +426,8 @@ const App: React.FC = () => {
                           <Icons.Zap />
                         </div>
                         <div>
-                          <h3 className="text-white font-bold text-lg">Upgrade to Pro for Unlimited Generations</h3>
-                          <p className="text-white/80 text-sm">Create unlimited content with higher quality and priority support</p>
+                          <h3 className="text-white font-bold text-lg">Upgrade to Pro for 100 Posts per Month</h3>
+                          <p className="text-white/80 text-sm">~3 posts per day with higher quality and priority support</p>
                         </div>
                       </div>
                       <button

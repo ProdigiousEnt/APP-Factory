@@ -51,7 +51,7 @@ export const PaywallModal: React.FC<PaywallModalProps> = ({ onClose, onPurchase 
 
     const openPrivacyPolicy = async () => {
         await Browser.open({
-            url: 'https://prodigiousent.github.io/APP-Factory/vibepaper/privacy-policy.html'
+            url: 'https://prodigiousent.github.io/APP-Factory/docs/vibepaper/privacy-policy.html'
         });
     };
 

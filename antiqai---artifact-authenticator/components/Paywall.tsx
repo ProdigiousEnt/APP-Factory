@@ -175,7 +175,7 @@ export const Paywall: React.FC<PaywallProps> = ({ onClose }) => {
                     {/* Legal Links */}
                     <div className="flex items-center justify-center gap-4 mt-6 text-xs pb-2">
                         <button
-                            onClick={() => openLink('https://prodigiousent.github.io/APP-Factory/antiqueai/privacy-policy.html')}
+                            onClick={() => openLink('https://prodigiousent.github.io/APP-Factory/docs/antiqueai/privacy-policy.html')}
                             className="text-amber-600 hover:text-amber-700 underline"
                         >
                             Privacy Policy

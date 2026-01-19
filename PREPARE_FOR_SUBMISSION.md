@@ -30,12 +30,14 @@ The App Factory uses a **dual-repository architecture** to maintain code privacy
 **URL:** `https://github.com/ProdigiousEnt/APP-Factory-Private.git`
 
 **Contains:**
+
 - All source code for every app
 - Development files and configurations
 - Environment files (`.env.local`)
 - Build artifacts (`dist/`, `ios/`, `node_modules/`)
 
 **Structure:**
+
 ```
 APP-Factory-Private/
 ├── .gitignore                    # Excludes app dirs from public repo
@@ -59,11 +61,13 @@ APP-Factory-Private/
 **GitHub Pages:** `https://prodigiousent.github.io/APP-Factory/`
 
 **Contains:**
+
 - Legal documentation ONLY
 - Privacy policies, terms of use, support pages
 - Publicly accessible via GitHub Pages
 
 **Structure:**
+
 ```
 APP-Factory/
 ├── .nojekyll                     # Disables Jekyll processing
@@ -83,18 +87,21 @@ APP-Factory/
 Each app's legal documentation is accessible via GitHub Pages:
 
 **URL Format:**
+
 ```
-https://prodigiousent.github.io/APP-Factory/{app-name}/{document}.html
+https://prodigiousent.github.io/APP-Factory/docs/{app-name}/{document}.html
 ```
 
 **Examples:**
-- Privacy Policy: `https://prodigiousent.github.io/APP-Factory/vibepaper/privacy-policy.html`
-- Support Page: `https://prodigiousent.github.io/APP-Factory/vibepaper/support.html`
-- Terms of Use: `https://prodigiousent.github.io/APP-Factory/vibepaper/terms-of-use.html`
+
+- Privacy Policy: `https://prodigiousent.github.io/APP-Factory/docs/vibepaper/privacy-policy.html`
+- Support Page: `https://prodigiousent.github.io/APP-Factory/docs/vibepaper/support.html`
+- Terms of Use: `https://prodigiousent.github.io/APP-Factory/docs/vibepaper/terms-of-use.html`
 
 ### Updating Legal Documentation
 
 1. **Edit in Private Repo:**
+
    ```bash
    cd /path/to/APP-Factory-Private
    vim docs/{app-name}/privacy-policy.html
@@ -104,6 +111,7 @@ https://prodigiousent.github.io/APP-Factory/{app-name}/{document}.html
    ```
 
 2. **Sync to Public Repo:**
+
    ```bash
    cd /path/to/APP-Factory
    cp -r ../APP-Factory-Private/docs/{app-name}/ {app-name}/
@@ -133,12 +141,14 @@ https://prodigiousent.github.io/APP-Factory/{app-name}/{document}.html
 ### Gemini 2.5 Flash Safety Filters
 
 **What Gemini BLOCKS (Always Active):**
+
 - Explicit nudity and sexual content
 - Child safety violations
 - Graphic violence and harmful content
 - Hate speech and illegal activities
 
 **What Gemini ALLOWS (Artistic Content):**
+
 - Sexual innuendo, sensual or suggestive imagery
 - Censored or implied nudity (classical art style)
 - Dark, gothic, or horror aesthetics
@@ -178,6 +188,7 @@ https://prodigiousent.github.io/APP-Factory/{app-name}/{document}.html
 #### For AI Text Generation Apps (9+ Rating)
 
 Same as above, but:
+
 - **Mature or Suggestive Themes:** Infrequent/Mild
 - **Profanity or Crude Humor:** Infrequent/Mild
 
@@ -205,6 +216,7 @@ All categories: **None** or **Not Applicable**
 ```
 
 **Examples:**
+
 - `vibepaper_pro_monthly`
 - `socialgenie_pro_monthly`
 - `cityscope_pro_monthly`
@@ -220,12 +232,14 @@ All monthly products should map to the same `pro` entitlement in RevenueCat.
 **Batch #1 Launch:** Early February 2026
 
 **Apps in Batch:**
+
 - SocialGenie Pro
 - CityScope AI
 - VibePaper
 - MemeGenius (in development)
 
 **Process:**
+
 1. Set all apps to **Manual Release** in App Store Connect
 2. Wait for all apps to reach "Ready for Distribution"
 3. Manually release all apps simultaneously
@@ -248,6 +262,7 @@ Every app must have:
 **Support Email:** `appfactory1970@gmail.com`
 
 **Privacy Policy Must Include:**
+
 - Information collected (device identifiers, usage data)
 - How information is used
 - Third-party services (Google Gemini, RevenueCat, Supabase)
@@ -257,6 +272,7 @@ Every app must have:
 - Contact information
 
 **Support Page Must Include:**
+
 - App description and features
 - How to use the app
 - Common questions/troubleshooting
@@ -265,10 +281,34 @@ Every app must have:
 
 ### GitHub Pages Deployment
 
+> [!CAUTION]
+> **CRITICAL: GitHub Pages MUST be set to `/root` (NOT `/docs`)**
+>
+> **Why:** All app privacy policy URLs include the `/docs/` prefix in their paths. When GitHub Pages serves from `/root`, files in the `/docs/` folder are accessible at URLs that include `/docs/` in the path.
+>
+> **Example:**
+>
+> - File location: `/docs/cityscope-ai/privacy-policy.html`
+> - App URL: `https://prodigiousent.github.io/APP-Factory/docs/cityscope-ai/privacy-policy.html`
+> - ✅ Works when GitHub Pages = `/root`
+> - ❌ Returns 404 when GitHub Pages = `/docs`
+>
+> **To Verify:**
+>
+> 1. Go to: `https://github.com/ProdigiousEnt/APP-Factory/settings/pages`
+> 2. Confirm "Source" is set to: **Deploy from a branch**
+> 3. Confirm "Branch" is set to: **main** and **/ (root)**
+> 4. If set to `/docs`, change to `/ (root)` and save
+> 5. Wait 1-2 minutes for GitHub Pages to rebuild
+> 6. Test all privacy policy URLs return 200 OK
+
+**Deployment Steps:**
+
 1. **Create legal docs** in private repo: `docs/{app-name}/`
-2. **Copy to public repo** at root level: `{app-name}/`
-3. **Verify URLs** are accessible
-4. **Update App Store Connect** with correct URLs
+2. **Copy to public repo** maintaining the `/docs/` structure: `docs/{app-name}/`
+3. **Verify GitHub Pages is set to `/root`** (see warning above)
+4. **Test URLs** are accessible (200 OK, not 404)
+5. **Update App Store Connect** with correct URLs
 
 ---
 
@@ -304,7 +344,8 @@ Every app must have:
 
 **Location:** App Store Connect → Monetization → **Subscriptions** (NOT In-App Purchases)
 
-**Important:** 
+**Important:**
+
 - **Subscriptions** tab = Auto-renewable subscriptions
 - **In-App Purchases** tab = Consumables and non-consumables (e.g., top-up packs)
 
@@ -334,7 +375,7 @@ Every app must have:
 
 **This is where the Privacy Policy URL goes** (not in subscriptions):
 
-- [ ] **Privacy Policy URL:** `https://prodigiousent.github.io/APP-Factory/{app-name}/privacy-policy.html`
+- [ ] **Privacy Policy URL:** `https://prodigiousent.github.io/APP-Factory/docs/{app-name}/privacy-policy.html`
 
 Complete the App Privacy questionnaire:
 
@@ -358,13 +399,38 @@ Complete the App Privacy questionnaire:
 - [ ] **What's New:** Release notes for updates (not needed for v1.0)
 - [ ] **Copyright:** `© 2026 Prodigious Entertainment`
 
+### App Description (Product Page)
+
+**Location:** App Store Connect → App Store → Product Page → Description
+
+> [!IMPORTANT]
+> **NEW REQUIREMENT (January 2026)**: Apps with subscriptions MUST include functional links to Privacy Policy and Terms of Use at the end of the App Description.
+
+**Required Links to Add at End of Description:**
+
+```
+Terms of Use: https://www.apple.com/legal/internet-services/itunes/dev/stdeula/
+Privacy Policy: https://prodigiousent.github.io/APP-Factory/docs/{app-name}/privacy-policy.html
+```
+
+**Checklist:**
+
+- [ ] App description includes functional link to Terms of Use (Apple Standard EULA)
+- [ ] App description includes functional link to Privacy Policy
+- [ ] Both links are at the end of the description
+- [ ] Links return 200 OK when tested (not 404)
+
+**Rationale:** Per Apple Developer Program License Agreement Schedule 2, Section 2.1, metadata delivery must include privacy policy and EULA. Apple now enforces this requirement by rejecting apps under Guideline 3.1.2 if these links are not present in the App Description.
+
+---
+
 ### Version Information (Submit for Review Page)
 
 **Location:** App Store Connect → App Store → Version → **iOS App Version X.X**
 
 **This is where the Support URL goes:**
 
-- [ ] **Support URL:** `https://prodigiousent.github.io/APP-Factory/{app-name}/support.html`
+- [ ] **Support URL:** `https://prodigiousent.github.io/APP-Factory/docs/{app-name}/support.html`
 
 ### App Review Information
 
@@ -381,11 +447,13 @@ Complete the App Privacy questionnaire:
 ### Screenshots
 
 **Required Sizes:**
+
 - iPhone 6.9" (iPhone 16 Pro Max): 1320 x 2868
 - iPhone 6.7" (iPhone 15 Pro Max): 1290 x 2796
 - iPad Pro 13" (6th gen): 2048 x 2732
 
 **Recommended:**
+
 - 3-5 screenshots per device type
 - Show key features and paywall
 - Include captions explaining features
@@ -420,11 +488,13 @@ Complete the App Privacy questionnaire:
 ### Code Integration
 
 **Install SDK:**
+
 ```bash
 npm install @revenuecat/purchases-capacitor
 ```
 
 **Initialize in App:**
+
 ```typescript
 import Purchases from '@revenuecat/purchases-capacitor';
 
@@ -435,12 +505,14 @@ await Purchases.configure({
 ```
 
 **Check Subscription Status:**
+
 ```typescript
 const { customerInfo } = await Purchases.getCustomerInfo();
 const isPro = customerInfo.entitlements.active['pro'] !== undefined;
 ```
 
 **Purchase Subscription:**
+
 ```typescript
 const offerings = await Purchases.getOfferings();
 const monthlyPackage = offerings.current?.availablePackages[0];
@@ -456,34 +528,67 @@ if (monthlyPackage) {
 
 ## Common Rejection Issues
 
+### Guideline 3.1.2 - Subscriptions (NEW - January 2026)
+
+**Issue:** Missing subscription metadata - EULA and Privacy Policy links not in App Description
+
+**Apple's Exact Rejection Message:**
+> "The submission did not include all the required information for apps offering auto-renewable subscriptions."
+>
+> "The following information needs to be included in the App Store metadata:"
+>
+> - A functional link to the Terms of Use (EULA). If you are using the standard Apple Terms of Use (EULA), include a link to the Terms of Use in the App Description.
+> - A functional link to the privacy policy in the Privacy Policy field in App Store Connect
+
+**Solutions:**
+
+- ✅ Add Terms of Use link to end of App Description: `https://www.apple.com/legal/internet-services/itunes/dev/stdeula/`
+- ✅ Add Privacy Policy link to end of App Description: `https://prodigiousent.github.io/APP-Factory/docs/{app-name}/privacy-policy.html`
+- ✅ Verify Privacy Policy URL is set in App Store Connect → Trust & Safety → App Privacy
+- ✅ Consider using [SubscriptionStoreView](https://developer.apple.com/documentation/storekit/subscriptionstoreview) (StoreKit 2) for automatic compliance
+- ✅ Ensure paywall shows pricing, duration, auto-renewal disclaimer, and functional legal links
+
+**Reference Documentation:**
+
+- [SubscriptionStoreView](https://developer.apple.com/documentation/storekit/subscriptionstoreview)
+- [Custom License Agreement](https://developer.apple.com/help/app-store-connect/manage-app-information/provide-a-custom-license-agreement)
+- [Developer Program License Agreement - Schedule 2](https://developer.apple.com/support/terms/apple-developer-program-license-agreement/#S2)
+
+---
+
 ### Guideline 2.1 - App Completeness
 
 **Issue:** Broken links, 404 errors, missing functionality
 
 **Solutions:**
+
 - ✅ Verify all legal links work (Privacy Policy, Terms, Support)
 - ✅ Test paywall displays correctly
 - ✅ Ensure subscription purchase flow works
 - ✅ Test on physical device, not just simulator
 
-### Guideline 3.1.2 - Subscriptions
+### Guideline 3.1.2 - Subscriptions (Legacy Issues - Pre-January 2026)
 
 **Issue:** Missing subscription metadata, unclear pricing, missing legal links
 
 **Solutions:**
-- ✅ Add Privacy Policy URL to subscription group
-- ✅ Add Terms of Use (or use Apple Standard EULA)
+
+- ✅ Add Privacy Policy URL to App Store Connect (Trust & Safety → App Privacy)
+- ✅ Add Terms of Use link to App Description
 - ✅ Ensure paywall shows:
-  - Clear pricing ($4.99/month)
-  - Duration (monthly)
+  - Clear pricing ($4.99/month or $9.99/year)
+  - Duration (monthly or annual)
   - Auto-renewal disclaimer
   - Functional legal links at bottom
+
+**Note:** As of January 2026, Apple now requires EULA and Privacy Policy links in the App Description field. See "Guideline 3.1.2 - Subscriptions (NEW - January 2026)" section above for updated requirements.
 
 ### Guideline 1.5 - Safety
 
 **Issue:** Support URL not working or missing
 
 **Solutions:**
+
 - ✅ Verify Support URL returns 200 OK (not 404)
 - ✅ Support page must include contact information
 - ✅ Email must be functional: `appfactory1970@gmail.com`
@@ -493,6 +598,7 @@ if (monthlyPackage) {
 **Issue:** Age rating doesn't match content
 
 **Solutions:**
+
 - ✅ For AI image apps: Rate 12+ (not 4+)
 - ✅ Answer questionnaire accurately
 - ✅ Select "Infrequent/Mild Mature or Suggestive Themes"
@@ -503,6 +609,7 @@ if (monthlyPackage) {
 **Issue:** Too similar to other apps, minimal functionality
 
 **Solutions:**
+
 - ✅ Differentiate each app clearly
 - ✅ Unique value proposition in description
 - ✅ Different UI/UX for each app
@@ -540,8 +647,8 @@ LEGAL DOCUMENTATION:
 
 All legal documentation is publicly accessible via GitHub Pages:
 
-- Privacy Policy: https://prodigiousent.github.io/APP-Factory/[app-name]/privacy-policy.html
-- Support Page: https://prodigiousent.github.io/APP-Factory/[app-name]/support.html
+- Privacy Policy: https://prodigiousent.github.io/APP-Factory/docs/[app-name]/privacy-policy.html
+- Support Page: https://prodigiousent.github.io/APP-Factory/docs/[app-name]/support.html
 - Terms of Use: Apple Standard EULA
 
 Support Email: appfactory1970@gmail.com
@@ -643,7 +750,7 @@ Before clicking "Submit for Review":
 - [ ] Privacy Policy is live on GitHub Pages
 - [ ] Support page is live on GitHub Pages
 - [ ] Terms of Use is live (or using Apple Standard EULA)
-- [ ] All URLs use correct format: `https://prodigiousent.github.io/APP-Factory/{app-name}/`
+- [ ] All URLs use correct format: `https://prodigiousent.github.io/APP-Factory/docs/{app-name}/`
 - [ ] Support email is `appfactory1970@gmail.com`
 
 ---

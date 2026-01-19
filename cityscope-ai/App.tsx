@@ -928,7 +928,7 @@ const App: React.FC = () => {
                 </button>
                 <span className="text-gray-300">•</span>
                 <button
-                  onClick={async () => await Browser.open({ url: 'https://prodigiousent.github.io/APP-Factory/cityscope/index.html' })}
+                  onClick={async () => await Browser.open({ url: 'https://prodigiousent.github.io/APP-Factory/docs/cityscope-ai/privacy-policy.html' })}
                   className="text-blue-600 font-bold underline hover:text-blue-700 transition-colors"
                 >
                   Privacy Policy
