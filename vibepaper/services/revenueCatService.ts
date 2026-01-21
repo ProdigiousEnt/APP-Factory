@@ -6,7 +6,7 @@ import { Capacitor } from '@capacitor/core';
 const APPLE_API_KEY = (import.meta as any).env.VITE_REVENUECAT_APPLE_KEY || '';
 // Support both products during review (reviewer may be grandfathered into yearly)
 const PRIMARY_PRODUCT_ID = 'vibepaper_pro_monthly'; // Primary product for new subscribers
-const LEGACY_PRODUCT_ID = 'vibepaper_pro_yearly'; // Legacy product for grandfathered users
+const LEGACY_PRODUCT_ID = 'vibepaper_pro_yearly1'; // Legacy product for grandfathered users (matches ASC)
 const ENTITLEMENT_ID = 'pro';
 
 export const revenueCatService = {
