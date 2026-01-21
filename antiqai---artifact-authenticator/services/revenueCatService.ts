@@ -63,13 +63,19 @@ class RevenueCatService {
             }
 
             const currentOffering = offerings.offerings.current;
-            const packageToPurchase = currentOffering.availablePackages.find(
-                pkg => pkg.identifier === packageId
-            );
 
-            if (!packageToPurchase) {
-                throw new Error(`Package ${packageId} not found`);
+            // Use the first available package (matches SocialGenie Pro pattern)
+            if (!currentOffering.availablePackages || currentOffering.availablePackages.length === 0) {
+                throw new Error('No packages available in current offering');
             }
+
+            const packageToPurchase = currentOffering.availablePackages[0];
+
+            console.log('📦 Purchasing package:', {
+                identifier: packageToPurchase.identifier,
+                product: packageToPurchase.product.identifier,
+                price: packageToPurchase.product.priceString
+            });
 
             const purchaseResult = await Purchases.purchasePackage({
                 aPackage: packageToPurchase

@@ -282,7 +282,14 @@ Every app must have:
 ### GitHub Pages Deployment
 
 > [!CAUTION]
-> **CRITICAL: GitHub Pages MUST be set to `/root` (NOT `/docs`)**
+> **CRITICAL: GitHub Pages MUST remain set to `/root` (NEVER change to `/docs`)**
+>
+> **What "/root" means:** In the GitHub Pages settings at `https://github.com/ProdigiousEnt/APP-Factory/settings/pages`, the "Branch" dropdown shows:
+>
+> - Branch: `main`
+> - Path: `/ (root)` ← **This is what we mean by "/root"**
+>
+> **This setting is ALREADY CORRECT. Do not change it.**
 >
 > **Why:** All app privacy policy URLs include the `/docs/` prefix in their paths. When GitHub Pages serves from `/root`, files in the `/docs/` folder are accessible at URLs that include `/docs/` in the path.
 >
@@ -293,14 +300,30 @@ Every app must have:
 > - ✅ Works when GitHub Pages = `/root`
 > - ❌ Returns 404 when GitHub Pages = `/docs`
 >
-> **To Verify:**
+> **URL Structure Explained:**
+>
+> GitHub Pages URLs for organization repos always include the repository name:
+>
+> ```
+> https://{org}.github.io/{repo-name}/{path-to-file}
+> ```
+>
+> For our setup:
+>
+> - Organization: `prodigiousent`
+> - Repository: `APP-Factory`
+> - File path: `docs/{app-name}/privacy-policy.html`
+> - **Final URL**: `https://prodigiousent.github.io/APP-Factory/docs/{app-name}/privacy-policy.html`
+>
+> ⚠️ **Common Mistake**: Do NOT omit `/APP-Factory/` from URLs. The repository name is required.
+>
+> **To Verify (DO NOT CHANGE, only verify):**
 >
 > 1. Go to: `https://github.com/ProdigiousEnt/APP-Factory/settings/pages`
 > 2. Confirm "Source" is set to: **Deploy from a branch**
 > 3. Confirm "Branch" is set to: **main** and **/ (root)**
-> 4. If set to `/docs`, change to `/ (root)` and save
-> 5. Wait 1-2 minutes for GitHub Pages to rebuild
-> 6. Test all privacy policy URLs return 200 OK
+> 4. **If it shows `/ (root)`, DO NOT CHANGE IT - this is correct**
+> 5. Test all privacy policy URLs return 200 OK
 
 **Deployment Steps:**
 
@@ -523,6 +546,58 @@ if (monthlyPackage) {
   });
 }
 ```
+
+> [!CAUTION]
+> **CRITICAL FINDING (January 2026): Use `availablePackages[0]` Instead of Identifier Matching**
+>
+> **Problem Pattern (AVOID):**
+>
+> ```typescript
+> // ❌ FRAGILE: Searching by package identifier
+> const offerings = await Purchases.getOfferings();
+> const packageToPurchase = offerings.current?.availablePackages.find(
+>   pkg => pkg.identifier === '$rc_monthly'
+> );
+> 
+> if (!packageToPurchase) {
+>   throw new Error('Package not found'); // This can fail unexpectedly
+> }
+> ```
+>
+> **Why This Fails:**
+>
+> - Package identifier matching is brittle and prone to errors
+> - Identifier format may vary (`$rc_monthly` vs `monthly` vs custom IDs)
+> - RevenueCat SDK versions may handle identifiers differently
+> - Causes "Purchase failed" errors even when RevenueCat is configured correctly
+>
+> **Robust Pattern (RECOMMENDED):**
+>
+> ```typescript
+> // ✅ ROBUST: Use first available package
+> const offerings = await Purchases.getOfferings();
+> const monthlyPackage = offerings.current?.availablePackages[0];
+> 
+> if (monthlyPackage) {
+>   await Purchases.purchasePackage({ aPackage: monthlyPackage });
+> }
+> ```
+>
+> **Why This Works:**
+>
+> - No string matching required
+> - Works regardless of package identifier format
+> - More forgiving and resilient
+> - Matches pattern used in successful apps (SocialGenie Pro, CityScope, SplitSmart)
+>
+> **When Discovered:** During AntiqueAI troubleshooting (January 21, 2026)
+>
+> - RevenueCat configuration was correct
+> - Offerings loaded successfully
+> - Purchase failed due to identifier matching logic
+> - Switching to `availablePackages[0]` immediately resolved the issue
+>
+> **Fleet-Wide Impact:** All future apps should use this pattern from the start to avoid "Purchase failed" errors during development and testing.
 
 ---
 
