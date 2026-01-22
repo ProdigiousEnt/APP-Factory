@@ -80,23 +80,17 @@ const App: React.FC = () => {
     const file = e.target.files?.[0];
     if (!file) return;
 
+    setLoading(true);
     try {
       if (file.type === 'application/pdf') {
-        // Handle PDF files
-        const arrayBuffer = await file.arrayBuffer();
-        const pdf = await import('pdfjs-dist');
-        pdf.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdf.version}/pdf.worker.min.js`;
-        const pdfDoc = await pdf.getDocument({ data: arrayBuffer }).promise;
-        let fullText = '';
-        for (let i = 1; i <= pdfDoc.numPages; i++) {
-          const page = await pdfDoc.getPage(i);
-          const textContent = await page.getTextContent();
-          const pageText = textContent.items.map((item: any) => item.str).join(' ');
-          fullText += pageText + '\n';
-        }
-        setter(fullText.trim());
+        // For PDFs, ask user to copy/paste text for now
+        // PDF.js worker doesn't load reliably in iOS webview
+        alert('PDF detected! Please open your PDF, select all text (Cmd+A), copy it, and paste it into the text area above.');
+        setLoading(false);
+        return;
       } else if (file.type.startsWith('image/')) {
         // Handle image files with OCR
+        alert('Processing image with OCR... This may take a few seconds.');
         const Tesseract = await import('tesseract.js');
         const result = await Tesseract.recognize(file, 'eng');
         setter(result.data.text);
@@ -111,7 +105,9 @@ const App: React.FC = () => {
       }
     } catch (error) {
       console.error('File upload error:', error);
-      alert('Failed to read file. Please try a different format.');
+      alert('Failed to read file. Please try copying and pasting the text instead.');
+    } finally {
+      setLoading(false);
     }
   };
 
