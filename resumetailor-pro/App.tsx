@@ -216,6 +216,13 @@ const App: React.FC = () => {
         >
           Analyze & Tailor
         </Button>
+
+        <button
+          onClick={() => setState(AppState.TUTORIAL)}
+          className="w-full mt-4 text-sm text-blue-600 underline"
+        >
+          How to Use This App
+        </button>
       </div>
     </div>
   );
@@ -348,11 +355,70 @@ const App: React.FC = () => {
     );
   };
 
+  const renderInfo = () => (
+    <div className="max-w-2xl mx-auto py-6 px-4 pb-24 animate-in fade-in duration-500">
+      <h2 className="text-2xl font-bold mb-4">How to Use ResumeTailor Pro</h2>
+
+      <div className="space-y-6">
+        <div>
+          <h3 className="text-lg font-semibold mb-2">📋 Quick Workflow</h3>
+          <ol className="list-decimal list-inside space-y-2 text-gray-700">
+            <li>Find a job posting you want to apply for</li>
+            <li>Copy the entire job description</li>
+            <li>Paste it into the "Job Description" field</li>
+            <li>Paste your resume into the "Your Resume" field</li>
+            <li>Tap "Analyze & Tailor"</li>
+            <li>Review your match score and tailored suggestions</li>
+            <li>Copy the tailored content and paste into your resume</li>
+          </ol>
+        </div>
+
+        <div>
+          <h3 className="text-lg font-semibold mb-2">💡 Pro Tips</h3>
+          <ul className="list-disc list-inside space-y-2 text-gray-700">
+            <li>For best results, convert your resume to .txt format</li>
+            <li>Keep ResumeTailor Pro open while job hunting</li>
+            <li>Tailor your resume for each application (takes 30 seconds!)</li>
+            <li>Copy specific sections you like - keep your design/branding</li>
+            <li>Use the "Copy Content" button for easy pasting</li>
+          </ul>
+        </div>
+
+        <div>
+          <h3 className="text-lg font-semibold mb-2">🎯 What You Get</h3>
+          <ul className="list-disc list-inside space-y-2 text-gray-700">
+            <li><strong>Job Alignment Score:</strong> See how well you match (0-100%)</li>
+            <li><strong>Strengths:</strong> What makes you a great fit</li>
+            <li><strong>Gaps:</strong> Missing keywords and qualifications</li>
+            <li><strong>Tailored Resume:</strong> Optimized headline, summary, and content</li>
+          </ul>
+        </div>
+
+        <div className="bg-blue-50 p-4 rounded-lg">
+          <p className="text-sm text-gray-700">
+            <strong>Free Tier:</strong> 3 analyses (lifetime)<br />
+            <strong>Pro Tier:</strong> 1,000 analyses/month for $4.99
+          </p>
+        </div>
+      </div>
+    </div>
+  );
+
+  const renderHistory = () => (
+    <div className="max-w-2xl mx-auto py-6 px-4 pb-24 animate-in fade-in duration-500">
+      <h2 className="text-2xl font-bold mb-4">Analysis History</h2>
+      <div className="bg-gray-100 p-8 rounded-lg text-center">
+        <p className="text-gray-500">History feature coming soon!</p>
+        <p className="text-sm text-gray-400 mt-2">Your past analyses will appear here.</p>
+      </div>
+    </div>
+  );
+
   return (
     <div className="min-h-screen pb-safe">
       <Header
-        title={state === AppState.INPUT ? 'ResumeTailor Pro' : state === AppState.ANALYZING ? 'Processing' : 'Report'}
-        onBack={state !== AppState.INPUT ? handleReset : undefined}
+        title={state === AppState.INPUT ? 'ResumeTailor Pro' : state === AppState.ANALYZING ? 'Processing' : state === AppState.INFO ? 'How to Use' : state === AppState.HISTORY ? 'History' : 'Report'}
+        onBack={state !== AppState.INPUT && state !== AppState.INFO && state !== AppState.HISTORY ? handleReset : undefined}
         usageDisplay={usageDisplay}
         isPro={isPro}
         onUpgradeClick={() => setShowPaywall(true)}
@@ -362,7 +428,49 @@ const App: React.FC = () => {
         {state === AppState.INPUT && renderInput()}
         {state === AppState.ANALYZING && renderAnalyzing()}
         {state === AppState.RESULTS && renderResults()}
+        {state === AppState.INFO && renderInfo()}
+        {state === AppState.HISTORY && renderHistory()}
       </main>
+
+      {/* Bottom Navigation Bar */}
+      {state !== AppState.ANALYZING && state !== AppState.RESULTS && (
+        <div className="fixed bottom-0 left-0 right-0 bg-white border-t border-gray-200 safe-bottom">
+          <div className="flex justify-around items-center h-16 max-w-2xl mx-auto">
+            <button
+              onClick={() => setState(AppState.INPUT)}
+              className={`flex flex-col items-center justify-center flex-1 h-full transition-colors ${state === AppState.INPUT ? 'text-blue-600' : 'text-gray-400'
+                }`}
+            >
+              <svg className="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M3 12l2-2m0 0l7-7 7 7M5 10v10a1 1 0 001 1h3m10-11l2 2m-2-2v10a1 1 0 01-1 1h-3m-6 0a1 1 0 001-1v-4a1 1 0 011-1h2a1 1 0 011 1v4a1 1 0 001 1m-6 0h6" />
+              </svg>
+              <span className="text-xs font-medium">Home</span>
+            </button>
+
+            <button
+              onClick={() => setState(AppState.HISTORY)}
+              className={`flex flex-col items-center justify-center flex-1 h-full transition-colors ${state === AppState.HISTORY ? 'text-blue-600' : 'text-gray-400'
+                }`}
+            >
+              <svg className="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span className="text-xs font-medium">History</span>
+            </button>
+
+            <button
+              onClick={() => setState(AppState.INFO)}
+              className={`flex flex-col items-center justify-center flex-1 h-full transition-colors ${state === AppState.INFO ? 'text-blue-600' : 'text-gray-400'
+                }`}
+            >
+              <svg className="w-6 h-6 mb-1" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M13 16h-1v-4h-1m1-4h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+              </svg>
+              <span className="text-xs font-medium">Info</span>
+            </button>
+          </div>
+        </div>
+      )}
 
       {/* Floating Action for Results */}
       {state === AppState.RESULTS && (
