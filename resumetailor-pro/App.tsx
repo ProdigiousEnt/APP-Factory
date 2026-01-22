@@ -263,6 +263,8 @@ const App: React.FC = () => {
         title={state === AppState.INPUT ? 'ResumeTailor Pro' : state === AppState.ANALYZING ? 'Processing' : 'Report'}
         onBack={state !== AppState.INPUT ? handleReset : undefined}
         usageDisplay={usageDisplay}
+        isPro={isPro}
+        onUpgradeClick={() => setShowPaywall(true)}
       />
 
       <main>
