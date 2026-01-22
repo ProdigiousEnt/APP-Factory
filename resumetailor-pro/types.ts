@@ -23,5 +23,7 @@ export interface ResumeData {
 export enum AppState {
   INPUT = 'input',
   ANALYZING = 'analyzing',
-  RESULTS = 'results'
+  RESULTS = 'results',
+  INFO = 'info',
+  HISTORY = 'history'
 }
