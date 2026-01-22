@@ -82,31 +82,77 @@ const App: React.FC = () => {
 
     setLoading(true);
     try {
-      if (file.type === 'application/pdf') {
-        // For PDFs, ask user to copy/paste text for now
-        // PDF.js worker doesn't load reliably in iOS webview
-        alert('PDF detected! Please open your PDF, select all text (Cmd+A), copy it, and paste it into the text area above.');
+      // Use FileReader for all file types - works reliably in iOS
+      const reader = new FileReader();
+
+      reader.onload = async (event) => {
+        try {
+          const result = event.target?.result;
+
+          if (file.type === 'application/pdf') {
+            // For PDFs, try to extract text using pdf.js
+            try {
+              const arrayBuffer = result as ArrayBuffer;
+              const pdfjsLib = await import('pdfjs-dist');
+
+              // Use local worker instead of CDN for iOS compatibility
+              pdfjsLib.GlobalWorkerOptions.workerSrc = '/pdf.worker.min.js';
+
+              const pdf = await pdfjsLib.getDocument({ data: arrayBuffer }).promise;
+              let fullText = '';
+
+              for (let i = 1; i <= pdf.numPages; i++) {
+                const page = await pdf.getPage(i);
+                const textContent = await page.getTextContent();
+                const pageText = textContent.items.map((item: any) => item.str).join(' ');
+                fullText += pageText + '\n\n';
+              }
+
+              if (fullText.trim()) {
+                setter(fullText.trim());
+              } else {
+                alert('Could not extract text from PDF. Please try copying and pasting the text instead.');
+              }
+            } catch (pdfError) {
+              console.error('PDF parsing error:', pdfError);
+              alert('Could not read PDF. Please copy and paste the text instead.');
+            }
+          } else if (file.type.startsWith('image/')) {
+            // For images, use OCR
+            alert('Processing image... This may take 10-20 seconds.');
+            const Tesseract = await import('tesseract.js');
+            const ocrResult = await Tesseract.recognize(file, 'eng');
+            setter(ocrResult.data.text);
+          } else {
+            // For text files, just use the result as string
+            setter(result as string);
+          }
+        } catch (innerError) {
+          console.error('File processing error:', innerError);
+          alert('Failed to process file. Please try copying and pasting the text instead.');
+        } finally {
+          setLoading(false);
+        }
+      };
+
+      reader.onerror = () => {
+        alert('Failed to read file. Please try again or copy/paste the text.');
         setLoading(false);
-        return;
+      };
+
+      // Read file based on type
+      if (file.type === 'application/pdf') {
+        reader.readAsArrayBuffer(file);
       } else if (file.type.startsWith('image/')) {
-        // Handle image files with OCR
-        alert('Processing image with OCR... This may take a few seconds.');
-        const Tesseract = await import('tesseract.js');
-        const result = await Tesseract.recognize(file, 'eng');
-        setter(result.data.text);
+        // Images are handled directly by Tesseract, no need to read
+        reader.readAsDataURL(file);
       } else {
-        // Handle text files
-        const reader = new FileReader();
-        reader.onload = (event) => {
-          const text = event.target?.result as string;
-          setter(text);
-        };
         reader.readAsText(file);
       }
+
     } catch (error) {
       console.error('File upload error:', error);
-      alert('Failed to read file. Please try copying and pasting the text instead.');
-    } finally {
+      alert('Failed to upload file. Please try copying and pasting the text instead.');
       setLoading(false);
     }
   };
