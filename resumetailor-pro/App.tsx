@@ -179,7 +179,7 @@ const App: React.FC = () => {
         </div>
       </Section>
 
-      <Section title="Your Resume" footer="Paste your current resume or upload a file (.txt, .pdf, .jpg, .png).">
+      <Section title="Your Resume" footer="For best results, convert your resume to .txt format. Also accepts .pdf, .jpg, .png files.">
         <div className="relative">
           <textarea
             value={resumeText}
