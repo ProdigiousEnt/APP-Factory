@@ -76,41 +76,90 @@ const App: React.FC = () => {
     setResults(null);
   };
 
-  const handleFileUpload = (e: React.ChangeEvent<HTMLInputElement>, setter: (val: string) => void) => {
+  const handleFileUpload = async (e: React.ChangeEvent<HTMLInputElement>, setter: (val: string) => void) => {
     const file = e.target.files?.[0];
     if (!file) return;
 
-    const reader = new FileReader();
-    reader.onload = (event) => {
-      const text = event.target?.result as string;
-      setter(text);
-    };
-    reader.readAsText(file);
+    try {
+      if (file.type === 'application/pdf') {
+        // Handle PDF files
+        const arrayBuffer = await file.arrayBuffer();
+        const pdf = await import('pdfjs-dist');
+        pdf.GlobalWorkerOptions.workerSrc = `//cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdf.version}/pdf.worker.min.js`;
+        const pdfDoc = await pdf.getDocument({ data: arrayBuffer }).promise;
+        let fullText = '';
+        for (let i = 1; i <= pdfDoc.numPages; i++) {
+          const page = await pdfDoc.getPage(i);
+          const textContent = await page.getTextContent();
+          const pageText = textContent.items.map((item: any) => item.str).join(' ');
+          fullText += pageText + '\n';
+        }
+        setter(fullText.trim());
+      } else if (file.type.startsWith('image/')) {
+        // Handle image files with OCR
+        const Tesseract = await import('tesseract.js');
+        const result = await Tesseract.recognize(file, 'eng');
+        setter(result.data.text);
+      } else {
+        // Handle text files
+        const reader = new FileReader();
+        reader.onload = (event) => {
+          const text = event.target?.result as string;
+          setter(text);
+        };
+        reader.readAsText(file);
+      }
+    } catch (error) {
+      console.error('File upload error:', error);
+      alert('Failed to read file. Please try a different format.');
+    }
   };
 
   const renderInput = () => (
     <div className="max-w-2xl mx-auto py-6 animate-in fade-in duration-500">
       <Section title="Job Description" footer="Paste the full job posting text here.">
-        <textarea
-          value={jobDescription}
-          onChange={(e) => setJobDescription(e.target.value)}
-          placeholder="Required skills, responsibilities, etc..."
-          className="w-full h-48 p-4 text-base resize-none focus:outline-none placeholder:text-gray-400"
-        />
+        <div className="relative">
+          <textarea
+            value={jobDescription}
+            onChange={(e) => setJobDescription(e.target.value)}
+            placeholder="Required skills, responsibilities, etc..."
+            className="w-full h-48 p-4 pr-10 text-base resize-none focus:outline-none placeholder:text-gray-400"
+          />
+          {jobDescription && (
+            <button
+              onClick={() => setJobDescription('')}
+              className="absolute top-2 right-2 w-6 h-6 flex items-center justify-center rounded-full bg-gray-200 hover:bg-gray-300 text-gray-600 transition-colors"
+              aria-label="Clear job description"
+            >
+              ×
+            </button>
+          )}
+        </div>
       </Section>
 
-      <Section title="Your Resume" footer="Paste your current resume or upload a .txt file.">
-        <textarea
-          value={resumeText}
-          onChange={(e) => setResumeText(e.target.value)}
-          placeholder="Experience, education, skills..."
-          className="w-full h-48 p-4 text-base resize-none focus:outline-none placeholder:text-gray-400"
-        />
+      <Section title="Your Resume" footer="Paste your current resume or upload a file (.txt, .pdf, .jpg, .png).">
+        <div className="relative">
+          <textarea
+            value={resumeText}
+            onChange={(e) => setResumeText(e.target.value)}
+            placeholder="Experience, education, skills..."
+            className="w-full h-48 p-4 pr-10 text-base resize-none focus:outline-none placeholder:text-gray-400"
+          />
+          {resumeText && (
+            <button
+              onClick={() => setResumeText('')}
+              className="absolute top-2 right-2 w-6 h-6 flex items-center justify-center rounded-full bg-gray-200 hover:bg-gray-300 text-gray-600 transition-colors"
+              aria-label="Clear resume"
+            >
+              ×
+            </button>
+          )}
+        </div>
         <div className="border-t border-gray-100 p-3 bg-gray-50 flex items-center justify-between">
           <span className="text-sm text-gray-500">Import from file:</span>
           <input
             type="file"
-            accept=".txt"
+            accept=".txt,.pdf,.jpg,.jpeg,.png"
             onChange={(e) => handleFileUpload(e, setResumeText)}
             className="text-sm file:mr-4 file:py-1 file:px-3 file:rounded-full file:border-0 file:text-sm file:font-semibold file:bg-[#007AFF] file:text-white hover:file:bg-blue-600"
           />
