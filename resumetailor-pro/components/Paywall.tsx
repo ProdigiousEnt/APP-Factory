@@ -1,5 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { revenueCatService } from '../services/revenueCatService';
+import { Browser } from '@capacitor/browser';
 
 interface PaywallProps {
     onClose: () => void;
@@ -42,6 +43,10 @@ const Paywall: React.FC<PaywallProps> = ({ onClose, onPurchaseSuccess }) => {
         } finally {
             setRestoring(false);
         }
+    };
+
+    const openUrl = async (url: string) => {
+        await Browser.open({ url });
     };
 
     return (
@@ -127,23 +132,19 @@ const Paywall: React.FC<PaywallProps> = ({ onClose, onPurchaseSuccess }) => {
 
                     {/* Legal links */}
                     <div className="flex justify-center gap-4 mt-4 text-xs">
-                        <a
-                            href="https://prodigiousent.github.io/APP-Factory/docs/resumetailor-pro/privacy-policy.html"
-                            target="_blank"
-                            rel="noopener noreferrer"
+                        <button
+                            onClick={() => openUrl('https://prodigiousent.github.io/APP-Factory/docs/resumetailor-pro/privacy-policy.html')}
                             className="text-white/70 hover:text-white underline"
                         >
                             Privacy Policy
-                        </a>
+                        </button>
                         <span className="text-white/40">•</span>
-                        <a
-                            href="https://www.apple.com/legal/internet-services/itunes/dev/stdeula/"
-                            target="_blank"
-                            rel="noopener noreferrer"
+                        <button
+                            onClick={() => openUrl('https://www.apple.com/legal/internet-services/itunes/dev/stdeula/')}
                             className="text-white/70 hover:text-white underline"
                         >
                             Terms of Use
-                        </a>
+                        </button>
                     </div>
                 </div>
             </div>

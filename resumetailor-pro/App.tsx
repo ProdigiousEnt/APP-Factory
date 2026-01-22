@@ -267,7 +267,7 @@ const App: React.FC = () => {
         onUpgradeClick={() => setShowPaywall(true)}
       />
 
-      <main>
+      <main className="pt-4">
         {state === AppState.INPUT && renderInput()}
         {state === AppState.ANALYZING && renderAnalyzing()}
         {state === AppState.RESULTS && renderResults()}
