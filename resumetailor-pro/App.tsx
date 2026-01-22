@@ -356,7 +356,7 @@ const App: React.FC = () => {
   };
 
   const renderInfo = () => (
-    <div className="max-w-2xl mx-auto py-6 px-4 pb-24 animate-in fade-in duration-500">
+    <div className="max-w-2xl mx-auto pt-4 py-6 px-4 pb-24 animate-in fade-in duration-500">
       <h2 className="text-2xl font-bold mb-4">How to Use ResumeTailor Pro</h2>
 
       <div className="space-y-6">
@@ -405,7 +405,7 @@ const App: React.FC = () => {
   );
 
   const renderHistory = () => (
-    <div className="max-w-2xl mx-auto py-6 px-4 pb-24 animate-in fade-in duration-500">
+    <div className="max-w-2xl mx-auto pt-4 py-6 px-4 pb-24 animate-in fade-in duration-500">
       <h2 className="text-2xl font-bold mb-4">Analysis History</h2>
       <div className="bg-gray-100 p-8 rounded-lg text-center">
         <p className="text-gray-500">History feature coming soon!</p>
