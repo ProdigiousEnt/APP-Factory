@@ -1,8 +1,8 @@
 import { GoogleGenAI, Type, HarmCategory, HarmBlockThreshold } from "@google/genai";
-import { LandmarkAnalysis, LandmarkHistory, SearchSource } from "../types";
+import { LandmarkAnalysis, LandmarkHistory, SearchSource, CityRecommendation } from "../types";
 
 // The key provided by the user
-const DEBUG_KEY = "AIzaSyAtUrBmTdfo-ZCFyDSvq5xz2rKRJk64Ng0";
+const DEBUG_KEY = "AIzaSyBeC7QFc51Dq22QF2RxGqUZejvRC5IONIs";
 
 const getAI = () => {
     console.log("Initializing @google/genai Unified SDK...");
@@ -151,6 +151,80 @@ export async function researchLandmark(landmarkName: string, location: string): 
     } catch (err: any) {
         console.error("Gemini Research Error:", JSON.stringify(err, null, 2));
         throw err;
+    }
+}
+
+/**
+ * Get city landmark recommendations
+ * Returns top 5-7 must-see landmarks for a given city
+ */
+export async function getCityRecommendations(cityName: string): Promise<CityRecommendation[]> {
+    console.log("getCityRecommendations started for:", cityName);
+    const ai = getAI();
+
+    const prompt = `You are a world-class travel guide. Provide the top 5-7 must-see landmarks and attractions for "${cityName}".
+For each landmark, provide:
+- name: The specific name of the landmark
+- description: A compelling 1-2 sentence description that captures what makes it special
+- category: One of: "Historical", "Cultural", "Natural", "Modern", "Religious", "Entertainment"
+- estimatedDuration: Suggested visit time (e.g., "2-3 hours", "Half day", "1 hour")
+- uniqueFact: One fascinating fact that most tourists don't know
+
+Focus on iconic, must-visit locations that define the city's character. Prioritize famous landmarks over hidden gems.`;
+
+    try {
+        const response = await retryWithBackoff(
+            () => ai.models.generateContent({
+                model: MODELS.TEXT_FAST,
+                contents: [{ role: 'user', parts: [{ text: prompt }] }],
+                config: {
+                    responseMimeType: "application/json",
+                    responseSchema: {
+                        type: Type.OBJECT,
+                        properties: {
+                            recommendations: {
+                                type: Type.ARRAY,
+                                items: {
+                                    type: Type.OBJECT,
+                                    properties: {
+                                        name: { type: Type.STRING },
+                                        description: { type: Type.STRING },
+                                        category: { type: Type.STRING },
+                                        estimatedDuration: { type: Type.STRING },
+                                        uniqueFact: { type: Type.STRING }
+                                    },
+                                    required: ["name", "description", "category", "estimatedDuration", "uniqueFact"]
+                                }
+                            }
+                        },
+                        required: ["recommendations"]
+                    }
+                }
+            }),
+            'City recommendations'
+        );
+
+        console.log("City recommendations response received:", response.text);
+        const data = JSON.parse(response.text);
+        console.log("Parsed recommendations:", data.recommendations?.length || 0, "items");
+        return data.recommendations || [];
+    } catch (err: any) {
+        console.error("Gemini City Recommendations Error - Full Details:");
+        console.error("Error message:", err.message);
+        console.error("Error name:", err.name);
+        console.error("Error stack:", err.stack);
+        console.error("Full error object:", JSON.stringify(err, null, 2));
+
+        // Provide more specific error messages
+        if (err.message?.includes("API key")) {
+            throw new Error("API key issue. Please check your Gemini API key configuration.");
+        } else if (err.message?.includes("quota") || err.message?.includes("rate limit")) {
+            throw new Error("API rate limit exceeded. Please try again in a few moments.");
+        } else if (err.message?.includes("network") || err.message?.includes("fetch")) {
+            throw new Error("Network error. Please check your internet connection.");
+        } else {
+            throw new Error("Unable to fetch recommendations. Please check the city name and try again.");
+        }
     }
 }
 

@@ -1,7 +1,7 @@
 
 import React, { useState, useRef, useEffect } from 'react';
-import { AppState, LandmarkAnalysis, LandmarkHistory, StylePreset } from './types';
-import { identifyLandmark, researchLandmark, generateNarration, editLandmarkImage, decodeBase64, decodeAudioData, parsePostcardIntent } from './services/geminiService';
+import { AppState, LandmarkAnalysis, LandmarkHistory, StylePreset, CityRecommendation } from './types';
+import { identifyLandmark, researchLandmark, generateNarration, editLandmarkImage, getCityRecommendations } from './services/geminiService';
 import AROverlay from './components/AROverlay';
 import { Keyboard } from '@capacitor/keyboard';
 import { Share } from '@capacitor/share';
@@ -68,6 +68,10 @@ const App: React.FC = () => {
   const [history, setHistory] = useState<LandmarkHistory | null>(null);
   const [supabaseHistory, setSupabaseHistory] = useState<any[]>([]);
   const [error, setError] = useState<string | null>(null);
+  // City Recommendations State
+  const [cityInput, setCityInput] = useState('');
+  const [recommendations, setRecommendations] = useState<CityRecommendation[]>([]);
+  const [showCitySearch, setShowCitySearch] = useState(true);
   const [isPro, setIsPro] = useState(false);
   const [loadingPurchase, setLoadingPurchase] = useState(false);
   const [audioBase64, setAudioBase64] = useState<string | null>(null);
@@ -408,6 +412,35 @@ const App: React.FC = () => {
     await performEdit(effectDescription);
   };
 
+  // City Search Handler
+  const handleCitySearch = async () => {
+    if (!cityInput.trim()) return;
+
+    try {
+      setState(AppState.FETCHING_RECOMMENDATIONS);
+      const recs = await getCityRecommendations(cityInput);
+      setRecommendations(recs);
+      setState(AppState.IDLE);
+    } catch (err: any) {
+      setError(err.message || "Unable to fetch recommendations");
+      setRecommendations([]);
+      setState(AppState.IDLE);
+    }
+  };
+
+  // Get category icon for recommendations
+  const getCategoryIcon = (category: string): string => {
+    const icons: Record<string, string> = {
+      'Historical': '🏛️',
+      'Cultural': '🎨',
+      'Natural': '🌳',
+      'Modern': '🏙️',
+      'Religious': '⛪',
+      'Entertainment': '🎭'
+    };
+    return icons[category] || '📍';
+  };
+
   return (
     <div className="max-w-md mx-auto min-h-screen flex flex-col relative overflow-hidden bg-white">
       {/* Background Decorative Layer */}
@@ -474,78 +507,6 @@ const App: React.FC = () => {
               </button>
               <input type="file" ref={fileInputRef} onChange={handleFileUpload} accept="image/*" className="hidden" />
 
-              <div className="pt-8 w-full">
-                <p className="text-center text-[10px] font-black text-gray-400 uppercase tracking-[0.2em] mb-4">Quick Test (Desk Mode)</p>
-                <div className="flex gap-3 justify-center">
-                  <button
-                    onClick={() => {
-                      const sampleUrl = "/test-eiffel.jpg";
-                      fetch(sampleUrl)
-                        .then(res => res.blob())
-                        .then(blob => {
-                          const reader = new FileReader();
-                          reader.onloadend = () => {
-                            const dataUrl = reader.result as string;
-                            setOriginalImage(dataUrl);
-                            setDisplayImage(dataUrl);
-                            const base64 = dataUrl.split(',')[1];
-                            startWorkflow(base64);
-                          };
-                          reader.readAsDataURL(blob);
-                        });
-                    }}
-                    className="flex-1 bg-white border-2 border-gray-100 hover:border-blue-100 p-3 rounded-2xl flex flex-col items-center gap-2 transition-all active:scale-95 group"
-                  >
-                    <span className="text-2xl group-hover:scale-110 transition-transform">🗼</span>
-                    <span className="text-[10px] font-black text-gray-500 uppercase">Eiffel Tower</span>
-                  </button>
-                  <button
-                    onClick={() => {
-                      const sampleUrl = "/test-taj.jpg";
-                      fetch(sampleUrl)
-                        .then(res => res.blob())
-                        .then(blob => {
-                          const reader = new FileReader();
-                          reader.onloadend = () => {
-                            const dataUrl = reader.result as string;
-                            setOriginalImage(dataUrl);
-                            setDisplayImage(dataUrl);
-                            const base64 = dataUrl.split(',')[1];
-                            startWorkflow(base64);
-                          };
-                          reader.readAsDataURL(blob);
-                        });
-                    }}
-                    className="flex-1 bg-white border-2 border-gray-100 hover:border-blue-100 p-3 rounded-2xl flex flex-col items-center gap-2 transition-all active:scale-95 group"
-                  >
-                    <span className="text-2xl group-hover:scale-110 transition-transform">🕌</span>
-                    <span className="text-[10px] font-black text-gray-500 uppercase">Taj Mahal</span>
-                  </button>
-                  <button
-                    onClick={() => {
-                      const sampleUrl = "/test-statue.jpg";
-                      fetch(sampleUrl)
-                        .then(res => res.blob())
-                        .then(blob => {
-                          const reader = new FileReader();
-                          reader.onloadend = () => {
-                            const dataUrl = reader.result as string;
-                            setOriginalImage(dataUrl);
-                            setDisplayImage(dataUrl);
-                            const base64 = dataUrl.split(',')[1];
-                            startWorkflow(base64);
-                          };
-                          reader.readAsDataURL(blob);
-                        });
-                    }}
-                    className="flex-1 bg-white border-2 border-gray-100 hover:border-blue-100 p-3 rounded-2xl flex flex-col items-center gap-2 transition-all active:scale-95 group"
-                  >
-                    <span className="text-2xl group-hover:scale-110 transition-transform">🗽</span>
-                    <span className="text-[10px] font-black text-gray-500 uppercase">Statue Liberty</span>
-                  </button>
-                </div>
-              </div>
-
               {/* Feature Pills */}
               <div className="mt-20 flex gap-4 overflow-x-auto scrollbar-hide px-4 w-full justify-center">
                 <div className="bg-blue-50 px-4 py-2 rounded-2xl flex items-center gap-2 flex-shrink-0">
@@ -558,26 +519,103 @@ const App: React.FC = () => {
                 </div>
               </div>
 
-              {/* Coming Soon: City Recommendations */}
-              <div className="mt-12 p-6 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-3xl border-2 border-blue-100/50">
-                <div className="flex items-start gap-3 mb-3">
+              {/* City Recommendations Feature */}
+              <div className="mt-12 p-6 bg-gradient-to-br from-blue-50 to-indigo-50 rounded-3xl border-2 border-blue-100/50 relative">
+                {/* Close/Clear Button - Only show when there are recommendations */}
+                {recommendations.length > 0 && (
+                  <button
+                    onClick={() => {
+                      setRecommendations([]);
+                      setCityInput('');
+                    }}
+                    className="absolute top-4 right-4 p-2 bg-white/80 hover:bg-white rounded-full shadow-sm active:scale-90 transition-all"
+                  >
+                    <svg className="w-4 h-4 text-gray-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M6 18L18 6M6 6l12 12" />
+                    </svg>
+                  </button>
+                )}
+                <div className="flex items-start gap-3 mb-4 pr-8">{/* Added pr-8 for close button spacing */}
                   <div className="w-8 h-8 bg-blue-600 rounded-full flex items-center justify-center flex-shrink-0">
                     <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M13 10V3L4 14h7v7l9-11h-7z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
                     </svg>
                   </div>
                   <div className="flex-1">
-                    <h3 className="text-sm font-black text-gray-900 uppercase tracking-wide">Coming Soon</h3>
+                    <h3 className="text-sm font-black text-gray-900 uppercase tracking-wide">Where are you visiting?</h3>
                     <p className="text-xs text-gray-600 mt-1 leading-relaxed">
-                      Tell us where you're visiting and get personalized landmark recommendations!
+                      Enter city and country for personalized landmark recommendations!
                     </p>
                   </div>
                 </div>
-                <div className="mt-4 p-3 bg-white/60 rounded-xl border border-blue-100">
-                  <p className="text-[10px] text-gray-500 font-medium">
-                    💡 <span className="font-bold">Example:</span> Type "Paris" → See Eiffel Tower, Louvre, Notre Dame
-                  </p>
+
+                {/* Search Input */}
+                <div className="relative flex gap-2 mb-4">
+                  <input
+                    type="text"
+                    placeholder="Enter city, country (e.g., Paris, France or Tokyo, Japan)..."
+                    className="flex-1 bg-white border-2 border-blue-100 rounded-2xl py-3 px-4 text-sm font-medium focus:outline-none focus:ring-2 focus:ring-blue-200 focus:border-blue-300 transition-all placeholder:text-gray-400"
+                    value={cityInput}
+                    onChange={(e) => setCityInput(e.target.value)}
+                    onKeyPress={(e) => e.key === 'Enter' && handleCitySearch()}
+                    disabled={state === AppState.FETCHING_RECOMMENDATIONS}
+                  />
+                  <button
+                    onClick={handleCitySearch}
+                    disabled={!cityInput.trim() || state === AppState.FETCHING_RECOMMENDATIONS}
+                    className="bg-blue-600 text-white px-6 py-3 rounded-2xl font-bold text-sm hover:bg-blue-700 active:scale-95 transition-all disabled:opacity-50 disabled:cursor-not-allowed flex items-center gap-2"
+                  >
+                    {state === AppState.FETCHING_RECOMMENDATIONS ? (
+                      <>
+                        <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin"></div>
+                        <span>Searching...</span>
+                      </>
+                    ) : (
+                      <>
+                        <svg className="w-4 h-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                          <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2.5" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                        </svg>
+                        <span>Search</span>
+                      </>
+                    )}
+                  </button>
                 </div>
+
+                {/* Recommendations Display */}
+                {recommendations.length > 0 && (
+                  <div className="space-y-3 animate-in fade-in slide-in-from-bottom duration-500">
+                    <p className="text-[10px] font-black text-blue-600 uppercase tracking-widest">Top Recommendations</p>
+                    <div className="space-y-2">{recommendations.map((rec, idx) => (
+                      <div key={idx} className="bg-white rounded-2xl p-4 border border-blue-100 shadow-sm">
+                        <div className="flex items-start gap-3">
+                          <span className="text-2xl flex-shrink-0">{getCategoryIcon(rec.category)}</span>
+                          <div className="flex-1 min-w-0">
+                            <div className="flex items-start justify-between gap-2 mb-1">
+                              <h4 className="font-black text-gray-900 text-sm leading-tight">{rec.name}</h4>
+                              <span className="text-[9px] font-bold text-blue-600 bg-blue-50 px-2 py-1 rounded-full whitespace-nowrap">{rec.estimatedDuration}</span>
+                            </div>
+                            <p className="text-xs text-gray-600 leading-relaxed mb-2">{rec.description}</p>
+                            <div className="flex items-start gap-1.5 bg-blue-50/50 rounded-lg p-2">
+                              <span className="text-xs">💡</span>
+                              <p className="text-[10px] text-gray-500 leading-relaxed italic">{rec.uniqueFact}</p>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    ))}
+                    </div>
+                  </div>
+                )}
+
+                {/* Example hint - only show when no recommendations */}
+                {recommendations.length === 0 && (
+                  <div className="p-3 bg-white/60 rounded-xl border border-blue-100">
+                    <p className="text-[10px] text-gray-500 font-medium">
+                      💡 <span className="font-bold">Example:</span> Type "Paris, France" → See Eiffel Tower, Louvre, Notre Dame
+                    </p>
+                  </div>
+                )}
               </div>
             </div>
           </div>

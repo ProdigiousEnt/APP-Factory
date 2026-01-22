@@ -25,6 +25,14 @@ export interface StylePreset {
   icon: string;
 }
 
+export interface CityRecommendation {
+  name: string;
+  description: string;
+  category: string;
+  estimatedDuration: string;
+  uniqueFact: string;
+}
+
 export enum AppState {
   IDLE = 'IDLE',
   ANALYZING = 'ANALYZING',
@@ -32,5 +40,6 @@ export enum AppState {
   NARRATING = 'NARRATING',
   EDITING = 'EDITING',
   READY = 'READY',
-  ERROR = 'ERROR'
+  ERROR = 'ERROR',
+  FETCHING_RECOMMENDATIONS = 'FETCHING_RECOMMENDATIONS'
 }
