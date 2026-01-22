@@ -1,0 +1,5 @@
+{
+  "name": "ResumeTailor Pro",
+  "description": "An iOS-inspired application that analyzes your resume against job descriptions, providing detailed critiques and perfectly tailored versions to increase your interview chances.",
+  "requestFramePermissions": []
+}
