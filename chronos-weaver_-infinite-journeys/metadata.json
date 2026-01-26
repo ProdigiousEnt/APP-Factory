@@ -1,8 +1,0 @@
-{
-  "name": "Chronos Weaver: Infinite Journeys",
-  "description": "An AI-powered infinite choose-your-own-adventure game with dynamic plot generation, real-time inventory and quest tracking, and high-fidelity consistent character art.",
-  "requestFramePermissions": [
-    "camera",
-    "microphone"
-  ]
-}
