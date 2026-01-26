@@ -1,7 +1,0 @@
-{
-  "name": "MemeGenius AI",
-  "description": "An AI-powered meme studio that analyzes images to suggest viral captions and uses GenAI for image editing.",
-  "requestFramePermissions": [
-    "camera"
-  ]
-}
