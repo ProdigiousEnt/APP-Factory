@@ -1,0 +1,8 @@
+{
+  "name": "MailGenie AI",
+  "description": "A powerful tool to generate full email marketing campaigns including copy, subject lines, and high-quality AI-generated visuals using Gemini 3 Pro.",
+  "requestFramePermissions": [
+    "camera",
+    "microphone"
+  ]
+}

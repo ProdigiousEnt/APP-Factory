@@ -1,0 +1,7 @@
+{
+  "name": "CommuteCast AI",
+  "description": "Transform your morning news into a personalized audio podcast for your commute using advanced AI summarization and text-to-speech.",
+  "requestFramePermissions": [
+    "microphone"
+  ]
+}

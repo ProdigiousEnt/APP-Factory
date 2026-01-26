@@ -1,0 +1,7 @@
+{
+  "name": "Virtual Food Photographer",
+  "description": "A high-end AI tool for restaurant owners to transform text menus into professional food photography using Gemini 3 Pro Image Preview. Features style-specific generation and AI-powered image editing.",
+  "requestFramePermissions": [
+    "camera"
+  ]
+}

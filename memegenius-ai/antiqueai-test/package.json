@@ -1,0 +1,12 @@
+{
+    "name": "antiqueai-test",
+    "version": "1.0.0",
+    "type": "module",
+    "description": "Test Gemini's antique identification capabilities",
+    "scripts": {
+        "test": "node test-antique-vision.js"
+    },
+    "dependencies": {
+        "@google/genai": "^1.35.0"
+    }
+}

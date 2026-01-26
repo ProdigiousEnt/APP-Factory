@@ -1,0 +1,8 @@
+{
+	"appId": "com.zensynth.app",
+	"appName": "ZenSynth",
+	"webDir": "dist",
+	"packageClassList": [
+		"PurchasesPlugin"
+	]
+}

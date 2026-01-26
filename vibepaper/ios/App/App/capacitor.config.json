@@ -1,0 +1,12 @@
+{
+	"appId": "com.vibepaper.app",
+	"appName": "vibepaper",
+	"webDir": "dist",
+	"packageClassList": [
+		"CAPBrowserPlugin",
+		"FilesystemPlugin",
+		"HapticsPlugin",
+		"SharePlugin",
+		"PurchasesPlugin"
+	]
+}

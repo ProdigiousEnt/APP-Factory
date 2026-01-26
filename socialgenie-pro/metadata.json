@@ -1,8 +1,0 @@
-{
-  "name": "SocialGenie Pro",
-  "description": "A cross-platform social media content generator that crafts platform-optimized copy and AI-generated imagery using Gemini 3 Pro.",
-  "requestFramePermissions": [
-    "camera",
-    "microphone"
-  ]
-}
