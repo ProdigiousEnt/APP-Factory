@@ -15,15 +15,11 @@ export const Paywall: React.FC<PaywallProps> = ({ onClose }) => {
     };
 
     const handlePurchase = async () => {
-        console.log('🟢 handlePurchase called in Paywall');
         setLoading(true);
         try {
-            console.log('🟢 About to call revenueCatService.purchasePackage');
             await revenueCatService.purchasePackage('$rc_monthly');
-            console.log('🟢 purchasePackage returned successfully');
             onClose();
         } catch (error: any) {
-            console.error('🔴 Error caught in handlePurchase:', error);
             if (!error.userCancelled) {
                 alert('Purchase failed. Please try again.');
             }

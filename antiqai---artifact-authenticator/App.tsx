@@ -12,7 +12,6 @@ import { revenueCatService } from './services/revenueCatService';
 type HistoryItem = {
   id: string;
   analysis: ArtifactAnalysis;
-  image: string;
   timestamp: number;
   isFavorite: boolean;
 };
@@ -25,20 +24,53 @@ const App: React.FC = () => {
   const [showPaywall, setShowPaywall] = useState(false);
   const [activeTab, setActiveTab] = useState<'home' | 'history' | 'settings'>('home');
   const [history, setHistory] = useState<HistoryItem[]>([]);
+  const [storageWarning, setStorageWarning] = useState(false);
   const fileInputRef = useRef<HTMLInputElement>(null);
+
+  // Calculate storage usage
+  const getStorageSize = () => {
+    try {
+      const historyData = localStorage.getItem('antiqueai_history');
+      return historyData ? new Blob([historyData]).size : 0;
+    } catch {
+      return 0;
+    }
+  };
+
+  const STORAGE_LIMIT = 5 * 1024 * 1024; // 5MB (conservative estimate)
+  const HISTORY_ITEM_LIMIT = 200; // Max 200 items (~1.2MB) - safe limit for all devices
 
   // Load history from localStorage on mount
   useEffect(() => {
-    const savedHistory = localStorage.getItem('antiqueai_history');
-    if (savedHistory) {
-      setHistory(JSON.parse(savedHistory));
+    try {
+      const savedHistory = localStorage.getItem('antiqueai_history');
+      if (savedHistory) {
+        setHistory(JSON.parse(savedHistory));
+      }
+    } catch (error) {
+      console.error('Failed to load history:', error);
+      // Clear corrupted data
+      localStorage.removeItem('antiqueai_history');
     }
   }, []);
 
   // Save history to localStorage whenever it changes
   useEffect(() => {
     if (history.length > 0) {
-      localStorage.setItem('antiqueai_history', JSON.stringify(history));
+      try {
+        localStorage.setItem('antiqueai_history', JSON.stringify(history));
+      } catch (error) {
+        console.error('Failed to save history (quota exceeded):', error);
+        // Clear old data and try again with just current item
+        localStorage.removeItem('antiqueai_history');
+        try {
+          localStorage.setItem('antiqueai_history', JSON.stringify(history.slice(0, 1)));
+          setHistory(history.slice(0, 1));
+        } catch (e) {
+          console.error('Still failed, clearing all history');
+          setHistory([]);
+        }
+      }
     }
   }, [history]);
 
@@ -67,15 +99,21 @@ const App: React.FC = () => {
         setResult(analysis);
         setStatus(AppStatus.SUCCESS);
 
-        // Add to history
+        // Add to history (limit to 150 items to stay under 5MB)
         const historyItem: HistoryItem = {
           id: Date.now().toString(),
           analysis,
-          image: base64,
           timestamp: Date.now(),
           isFavorite: false
         };
-        setHistory(prev => [historyItem, ...prev]);
+        setHistory(prev => [historyItem, ...prev].slice(0, HISTORY_ITEM_LIMIT));
+
+        // Check storage size and warn if approaching limit
+        setTimeout(() => {
+          const storageSize = getStorageSize();
+          const storagePercent = (storageSize / STORAGE_LIMIT) * 100;
+          setStorageWarning(storagePercent > 80); // Warn at 80% full
+        }, 100);
       } catch (err: any) {
         console.error(err);
         setError(err.message || 'Failed to analyze artifact. Please try again.');
@@ -104,7 +142,6 @@ const App: React.FC = () => {
   };
 
   const viewHistoryItem = (item: HistoryItem) => {
-    setSelectedImage(item.image);
     setResult(item.analysis);
     setStatus(AppStatus.SUCCESS);
     setActiveTab('home');
@@ -175,12 +212,20 @@ const App: React.FC = () => {
                 </div>
                 <h3 className="text-lg font-bold text-gray-900 mb-2">Analysis Failed</h3>
                 <p className="text-gray-500 text-sm mb-6">{error}</p>
-                <button
-                  onClick={reset}
-                  className="px-6 py-3 bg-gray-900 text-white font-bold rounded-2xl hover:bg-gray-800 transition-colors"
-                >
-                  Try Again
-                </button>
+                <div className="flex gap-3">
+                  <button
+                    onClick={reset}
+                    className="px-6 py-3 bg-amber-600 text-white font-bold rounded-2xl hover:bg-amber-700 transition-colors"
+                  >
+                    Take New Photo
+                  </button>
+                  <button
+                    onClick={() => setActiveTab('home')}
+                    className="px-6 py-3 bg-gray-200 text-gray-700 font-bold rounded-2xl hover:bg-gray-300 transition-colors"
+                  >
+                    Go Home
+                  </button>
+                </div>
               </div>
             )}
           </>
@@ -201,12 +246,14 @@ const App: React.FC = () => {
               history.map(item => (
                 <div key={item.id} className="bg-white rounded-2xl shadow-sm border border-gray-100 overflow-hidden">
                   <div className="flex gap-4 p-4">
-                    <img
-                      src={item.image}
-                      alt={item.analysis.name}
-                      className="w-24 h-24 object-cover rounded-xl flex-shrink-0 cursor-pointer"
+                    <div
+                      className="w-24 h-24 bg-gradient-to-br from-amber-100 to-orange-100 rounded-xl flex-shrink-0 flex items-center justify-center cursor-pointer"
                       onClick={() => viewHistoryItem(item)}
-                    />
+                    >
+                      <svg className="w-12 h-12 text-amber-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 3v4M3 5h4M6 17v4m-2-2h4m5-16l2.286 6.857L21 12l-5.714 2.143L13 21l-2.286-6.857L5 12l5.714-2.143L13 3z" />
+                      </svg>
+                    </div>
                     <div className="flex-1 min-w-0">
                       <div className="flex items-start justify-between gap-2">
                         <h3

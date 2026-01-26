@@ -10,6 +10,7 @@ interface PaywallModalProps {
 export const PaywallModal: React.FC<PaywallModalProps> = ({ onClose, onPurchase }) => {
     const [isRestoring, setIsRestoring] = useState(false);
     const [isPurchasing, setIsPurchasing] = useState(false);
+    const [selectedPlan, setSelectedPlan] = useState<'monthly' | 'yearly'>('monthly');
 
     const handleRestore = async () => {
         console.log('[PaywallModal] 🔘 Restore Purchases button tapped');
@@ -89,17 +90,45 @@ export const PaywallModal: React.FC<PaywallModalProps> = ({ onClose, onPurchase 
                     Create stunning AI wallpapers with 100 generations per month
                 </p>
 
+                {/* Plan Selector */}
+                <div className="flex gap-3 mb-6 w-full max-w-sm">
+                    <button
+                        onClick={() => setSelectedPlan('monthly')}
+                        className={`flex-1 py-3 px-4 rounded-xl font-semibold transition-all ${selectedPlan === 'monthly'
+                            ? 'bg-white text-blue-600 shadow-lg'
+                            : 'bg-white/20 text-white hover:bg-white/30'
+                            }`}
+                    >
+                        Monthly
+                    </button>
+                    <button
+                        onClick={() => setSelectedPlan('yearly')}
+                        className={`flex-1 py-3 px-4 rounded-xl font-semibold transition-all ${selectedPlan === 'yearly'
+                            ? 'bg-white text-blue-600 shadow-lg'
+                            : 'bg-white/20 text-white hover:bg-white/30'
+                            }`}
+                    >
+                        Yearly
+                    </button>
+                </div>
+
                 {/* White Subscription Info Card */}
                 <div className="mx-6 mb-6 bg-white rounded-2xl p-6 shadow-xl border border-slate-100 w-full max-w-sm">
                     {/* Title + Price Row */}
                     <div className="flex justify-between items-start mb-4">
                         <div>
                             <h3 className="text-xl font-bold text-slate-900">VibePaper Pro</h3>
-                            <p className="text-sm text-blue-600 font-semibold">Monthly Subscription</p>
+                            <p className="text-sm text-blue-600 font-semibold">
+                                {selectedPlan === 'monthly' ? 'Monthly Subscription' : 'Yearly Subscription'}
+                            </p>
                         </div>
                         <div className="text-right">
-                            <p className="text-2xl font-bold text-slate-900">$4.99</p>
-                            <p className="text-sm text-slate-500">per month</p>
+                            <p className="text-2xl font-bold text-slate-900">
+                                {selectedPlan === 'monthly' ? '$4.99' : '$1.99'}
+                            </p>
+                            <p className="text-sm text-slate-500">
+                                {selectedPlan === 'monthly' ? 'per month' : 'per year'}
+                            </p>
                         </div>
                     </div>
 
@@ -107,7 +136,7 @@ export const PaywallModal: React.FC<PaywallModalProps> = ({ onClose, onPurchase 
                     <div className="space-y-2 mb-4 pb-4 border-b border-slate-200">
                         <div className="flex items-center gap-2 text-sm text-slate-700">
                             <span>⏱</span>
-                            <span>Billed monthly</span>
+                            <span>Billed {selectedPlan === 'monthly' ? 'monthly' : 'yearly'}</span>
                         </div>
                         <div className="flex items-center gap-2 text-sm text-slate-700">
                             <span>💵</span>
@@ -146,7 +175,7 @@ export const PaywallModal: React.FC<PaywallModalProps> = ({ onClose, onPurchase 
 
                 {/* Auto-Renewal Disclaimer */}
                 <p className="text-[10px] text-center text-white/70 mb-4 px-6 leading-tight max-w-sm">
-                    Subscription automatically renews monthly. Cancel anytime in App Store settings.
+                    Subscription automatically renews {selectedPlan === 'monthly' ? 'monthly' : 'yearly'}. Cancel anytime in App Store settings.
                     Payment charged to Apple ID at confirmation of purchase.
                 </p>
 

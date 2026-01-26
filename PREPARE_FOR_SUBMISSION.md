@@ -601,6 +601,215 @@ if (monthlyPackage) {
 
 ---
 
+## To be inserted into PREPARE_FOR_SUBMISSION.md at line 604 (before "## Common Rejection Issues")
+
+---
+
+## Sandbox Testing Protocol
+
+**CRITICAL:** Always test subscriptions in Apple's sandbox environment BEFORE submitting to App Store. This is what Apple reviewers use to test your app.
+
+### Prerequisites
+
+1. **Sandbox Test Accounts** (Already Created - Fleet-Wide)
+   - `appfactory.test1@gmail.com`
+   - `appfactory.test2@gmail.com`
+   - `appfactory.test3@gmail.com`
+   - `appfactory.test4@gmail.com`
+   - `appfactory.test5@gmail.com`
+
+   **Location:** App Store Connect → Users and Access → Sandbox
+
+2. **Requirements for Sandbox Testing**
+   - ✅ Paid Applications Agreement signed (App Store Connect → Agreements, Tax, and Banking)
+   - ✅ Subscription status: "Ready to Submit" (NOT "Approved" - approval not needed for sandbox)
+   - ✅ Product ID, Reference Name, Pricing configured
+   - ✅ At least one localization (name + description)
+   - ✅ Real iOS device (simulator limited for full testing)
+
+### Step-by-Step Testing Process
+
+#### 1. Prepare Device
+
+```bash
+# Sign out of App Store on device
+Settings → [Your Name] → Media & Purchases → Sign Out
+
+# Enable Developer Mode (iOS 16+)
+Settings → Privacy & Security → Developer Mode → ON
+```
+
+**IMPORTANT:** Do NOT sign in with sandbox account yet - wait for purchase prompt!
+
+#### 2. Build and Install
+
+```bash
+# Open Xcode
+cd "/Users/dennisharrington/Documents/APP Factory/{app-name}"
+open ios/App/App.xcodeproj
+
+# Connect device via USB
+# Select device in Xcode (not simulator)
+# Product → Run (⌘R)
+```
+
+#### 3. Test Purchase with Console Logging
+
+**Open Xcode Console:**
+
+- View → Debug Area → Show Debug Area (⌘⇧Y)
+- Filter console: type `RevenueCat` in search box
+
+**Trigger Purchase:**
+
+1. In app, open paywall
+2. Tap "Start Pro Subscription" (or equivalent)
+3. Sign in with sandbox account when prompted
+4. Watch console for detailed logs
+
+**Expected Success Logs:**
+
+```
+✅ RevenueCat initialized successfully
+📦 Available offerings: [...]
+📦 Purchasing package: {...}
+[Environment: Sandbox]  ← Confirms sandbox mode
+✅ Purchase successful
+```
+
+**Common Failure Logs:**
+
+```
+❌ Failed to get offerings
+❌ No current offering available
+❌ No packages available
+❌ Purchase failed: [ERROR DETAILS]
+```
+
+#### 4. Verify Purchase Completion
+
+**Success Indicators:**
+
+- Payment sheet shows "[Environment: Sandbox]"
+- Purchase completes without real charge
+- Pro features unlock immediately
+- Console shows success messages
+
+**Failure Indicators:**
+
+- "Purchase failed. Please try again." alert
+- No payment sheet appears
+- Console shows specific error
+- Pro features don't unlock
+
+### Common Sandbox Errors and Solutions
+
+#### Error: "Invalid Product Identifiers"
+
+**Cause:** Product not in "Ready to Submit" status OR Bundle ID mismatch
+
+**Fix:**
+
+1. App Store Connect → In-App Purchases
+2. Verify subscription status is green "Ready to Submit"
+3. Check Bundle ID matches exactly: `com.prodigiousent.{app-name}`
+
+#### Error: "No Products Available"
+
+**Cause:** RevenueCat can't find product OR product not synced
+
+**Fix:**
+
+1. RevenueCat Dashboard → Products
+2. Verify product ID exists (e.g., `{app}_pro_monthly`)
+3. Check it's attached to `pro` entitlement
+4. Verify it's in `default` offering (set to Current)
+
+#### Error: "Offerings is null"
+
+**Cause:** RevenueCat API key issue OR network problem
+
+**Fix:**
+
+1. Check `.env.local` has correct API key
+2. Verify API key in RevenueCat dashboard matches
+3. Ensure device has internet connection
+
+#### Error: "Unable to Complete Purchase"
+
+**Cause:** Sandbox account issue OR StoreKit configuration
+
+**Fix:**
+
+1. Delete sandbox account and create new one
+2. Sign out completely from device
+3. Clear purchase history in App Store Connect
+4. Try again with fresh sandbox account
+
+### Subscription Testing Features in Sandbox
+
+**Accelerated Renewals:**
+
+- 1 month subscription → Renews every 5 minutes
+- Allows testing renewal flow quickly
+
+**Auto-Renewal Limits:**
+
+- Subscriptions renew up to 12 times automatically
+- Then stop to test expiration flow
+
+**Clear Purchase History:**
+
+- App Store Connect → Users and Access → Sandbox
+- Select tester → Clear Purchase History
+- Resets state for "first-time buyer" testing
+
+### Pre-Submission Sandbox Checklist
+
+Before submitting to App Store:
+
+- [ ] Sandbox test account created
+- [ ] Device signed out of App Store
+- [ ] App builds and runs on device
+- [ ] Paywall displays correctly
+- [ ] Tap "Start Pro Subscription"
+- [ ] Sandbox login prompt appears
+- [ ] Enter sandbox credentials
+- [ ] Payment sheet shows "[Environment: Sandbox]"
+- [ ] Purchase completes successfully
+- [ ] Console shows success logs (no errors)
+- [ ] Pro features unlock immediately
+- [ ] No "Purchase failed" errors
+
+**If ANY step fails, DO NOT submit to App Store. Fix the issue first.**
+
+### Why This Matters
+
+**Apple reviewers test the EXACT same way:**
+
+- They use sandbox test accounts
+- They tap "Start Pro Subscription"
+- If it fails for us, it fails for them
+- **Once it works in sandbox, it works for Apple**
+
+### Critical Finding (January 2026)
+
+**AntiqueAI Rejection Pattern:**
+
+- App rejected twice for "Purchase failed" error
+- Same error occurred in sandbox testing
+- Apple's message: "Test them in the sandbox"
+- **Root cause:** Purchase was actually failing (not a sandbox setup issue)
+
+**Lesson Learned:**
+
+- Sandbox testing reveals the EXACT error Apple will see
+- Console logs show specific failure reason
+- Fix the error in sandbox BEFORE submission
+- Retest until purchase succeeds
+- THEN submit to App Store
+
+---
 ## Common Rejection Issues
 
 ### Guideline 3.1.2 - Subscriptions (NEW - January 2026)

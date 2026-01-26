@@ -1,8 +1,10 @@
 
+
 export interface ArtifactAnalysis {
   name: string;
   category: string;
   estimatedPeriod: string;
+  estimatedValue: string;
   description: string;
   historicalContext: string;
   inspectionGuide: string;
