@@ -1,5 +1,0 @@
-{
-  "name": "Sentix: Customer Sentiment Dashboard",
-  "description": "An advanced analytics dashboard that transforms raw customer reviews into actionable insights using Gemini 3 Pro with deep reasoning capabilities. Features sentiment trend analysis, keyword visualization, and an AI-driven executive summary.",
-  "requestFramePermissions": []
-}
