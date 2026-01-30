@@ -1,7 +1,0 @@
-{
-  "name": "AuraHome AI: Interior Designer",
-  "description": "Transform your living space instantly with AI. Upload a photo, choose a style, and converse with a professional AI designer to refine your dream home.",
-  "requestFramePermissions": [
-    "camera"
-  ]
-}
