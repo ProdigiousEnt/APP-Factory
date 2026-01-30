@@ -1,7 +1,0 @@
-{
-  "name": "Grumpy Old Tourist",
-  "description": "The ultimate anti-tourist-trap guide. Find hidden local gems, uncrowded beaches, and quiet shopping spots with the honest, no-nonsense advice of a local who hates crowds.",
-  "requestFramePermissions": [
-    "geolocation"
-  ]
-}
